@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Project Path="CabinetMaster.Android/CabinetMaster.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="CabinetMaster.Browser/CabinetMaster.Browser.csproj" />
+  <Project Path="CabinetMaster.Desktop/CabinetMaster.Desktop.csproj" />
+  <Project Path="CabinetMaster.iOS/CabinetMaster.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="CabinetMaster/CabinetMaster.csproj" />
+</Solution>
