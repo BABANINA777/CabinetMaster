@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CabinetMaster.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CabinetMaster.Views.OrdersView"
+             x:DataType="vm:OrdersViewModel"
+             >
+    <Grid RowDefinitions="50, *">
+        <!--Кнопки Функционал-->
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
+                <Button Content="Добавить заказ" Click="AddOrder_Click"/>
+                <Button Content="Обновить" Command="{Binding LoadOrdersCommand}" />
+                <Button  Command="{Binding ToggleEditCommand}"
+                         Content="{Binding EditButtonText}" />
+            </StackPanel>
+            
+            <ProgressBar Minimum="0" 
+                         Maximum="100" 
+                         IsIndeterminate="True" 
+                         Height="3"
+                         IsVisible="{Binding IsBusy}"/>
+        </StackPanel>
+        
+        <!--Рабочая таблица-->
+        <DataGrid 
+            x:Name="MyDataGrid"
+            Grid.Row="1"
+            ItemsSource="{Binding Orders}" 
+            AutoGenerateColumns="False"
+            GridLinesVisibility="All"
+            CanUserSortColumns="True"
+            HeadersVisibility="All"
+            IsEnabled="{Binding !IsBusy}"
+            IsReadOnly="{Binding IsReadOnly}"
+            >
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="#" 
+                                    Binding="{Binding $parent[DataGridRow].Index}" 
+                                    Width="Auto"
+                                    IsReadOnly="True" 
+                                    CanUserSort="False" />
+                
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" SortMemberPath="Id"  IsReadOnly="True"/>
+                <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="2*" SortMemberPath="ClientName"  />
+                <DataGridTextColumn Header="Изделие" Binding="{Binding ItemName}" Width="2*" SortMemberPath="ItemName"  />
+                <DataGridTextColumn Header="Дата Заказа" Binding="{Binding OrderDate}" Width="Auto" SortMemberPath="OrderDate"  />
+                <DataGridTextColumn Header="Дата Сдачи" Binding="{Binding DeliveryDate}" Width="Auto" SortMemberPath="DeliveryDate"  />
+                <DataGridTextColumn Header="Стоимость (руб)" Binding="{Binding Price}" Width="1*" SortMemberPath="Price" IsReadOnly="False" />
+                <DataGridTextColumn Header="Себестоимость (руб)" Binding="{Binding MaterialCost}" Width="1*" SortMemberPath="MaterialCost"  />
+                <DataGridTextColumn Header="Чистая прибыль (руб)" Binding="{Binding Profit}" IsReadOnly="True" Width="1*" SortMemberPath="Profit" />
+                <DataGridTemplateColumn Header="Статус" Width="1*" SortMemberPath="Status">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:CompileBindings="False">
+                            <Grid>
+                                <TextBlock Text="{Binding Status}" 
+                                           VerticalAlignment="Center" 
+                                           HorizontalAlignment="Center"
+                                           IsVisible="{Binding $parent[DataGrid].IsReadOnly}"/>
+                
+                                <ComboBox ItemsSource="{Binding AllStatuses}"
+                                          SelectedItem="{Binding Status}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center"
+                                          IsVisible="{Binding !$parent[DataGrid].IsReadOnly}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="Удалить" Width="Auto" IsVisible="{Binding !IsReadOnly}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="❌" 
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Foreground="Red"
+                                    FontWeight="Bold"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Command="{ReflectionBinding $parent[DataGrid].DataContext.DeleteOrderCommand}"
+                                    CommandParameter="{Binding}"
+                                    IsVisible="{ReflectionBinding !$parent[DataGrid].DataContext.IsReadOnly}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <Grid Grid.Row="0" Grid.RowSpan="2" 
+              Background="#A0000000" 
+              IsVisible="{Binding ShowConfirmWindow}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            
+            <Border Background="{DynamicResource SystemRegionBrush}" 
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8" 
+                    Padding="20" 
+                    Width="350"
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center">
+                
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Удаление заказа" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="Вы уверены, что хотите удалить этот заказ? Данное действие невозможно отменить." 
+                               TextWrapping="Wrap" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                        <Button Content="ОК" 
+                                Width="80" 
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding ConfirmDeleteCommand}"
+                                HotKey="Enter"/> <Button Content="Отмена" 
+                                                         Width="80" 
+                                                         HorizontalContentAlignment="Center"
+                                                         Command="{Binding CancelDeleteCommand}" 
+                                                         HotKey="Escape"/> </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+    
+</UserControl>

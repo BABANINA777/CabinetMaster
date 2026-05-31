@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CabinetMaster.iOS", "Cabine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CabinetMaster.Browser", "CabinetMaster.Browser\CabinetMaster.Browser.csproj", "{13293E0E-D7E6-4BCE-92BC-B0D52755D95B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{FF4EE74D-E7B7-4D11-A76E-214D21D4BFA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -6,11 +6,58 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CabinetMaster.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+        
+        <Grid>
+        <Grid RowDefinitions="50, *">
+                <Border BorderThickness="0,1,0,0" BorderBrush="#E0D0D0">
+                        <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                        <GradientStop Color="#FFF3E5" Offset="0.0" /> <!-- Мягкий желто-кремовый -->
+                                        <GradientStop Color="#FFE4E1" Offset="0.5" /> <!-- Нежно-розовый -->
+                                        <GradientStop Color="#FFF0F5" Offset="1.0" /> <!-- Лавандово-розовый -->
+                                </LinearGradientBrush>
+                        </Border.Background>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Spacing="10">
+                                <StackPanel.Styles>
+                                        <Style Selector="Button">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                                <Setter Property="BorderThickness" Value="1,1,1,0"/>
+                                                <Setter Property="CornerRadius" Value="6,6,0,0"/>
+                                                <Setter Property="Padding" Value="16,8"/>
+                                                <Setter Property="FontSize" Value="13"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                <Setter Property="Foreground" Value="#555555"/>
+                                                <!-- Смещение вниз на 1 пиксель, чтобы перекрыть нижнюю рамку border'а при активации -->
+                                                <Setter Property="Margin" Value="0,0,0,-1"/> 
+                                        </Style>
+                                        <!-- Эффект наведения мыши -->
+                                        <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                <Setter Property="Background" Value="#A0FFFFFF"/>
+                                                <Setter Property="Foreground" Value="#222222"/>
+                                        </Style>
+                                </StackPanel.Styles>
+                                
+                                <Button Content="📦 Заказы" Command="{Binding ChangeModuleCommand}" 
+                                        CommandParameter="{Binding OrdersPage}">
+                                </Button>
+                                <Button Content="🪵 Склад" Command="{Binding ChangeModuleCommand}" 
+                                        CommandParameter="{Binding WarehousePage}"/>
+                                
+                                <Button Content="👥 Клиенты" Command="{Binding ChangeModuleCommand}" 
+                                        CommandParameter="{Binding ClientsPage}"/>
+                                
+                                <Button Content="📈 Отчетность" Command="{Binding ChangeModuleCommand}" 
+                                        CommandParameter="{Binding ReportsPage}" />
+                        </StackPanel>
+                </Border>
+                
+                <Grid Grid.Row="1">
+                        <ContentControl Content="{Binding CurrentPage}"/>
+                </Grid>
+        </Grid>
+        
+        </Grid>
 
-    <!--<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
+   
 </UserControl>
