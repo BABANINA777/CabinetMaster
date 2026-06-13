@@ -4,31 +4,39 @@ using System.Threading.Tasks;
 using CabinetMaster.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 
 namespace CabinetMaster.ViewModels;
 
 public partial class OrdersViewModel : ViewModelBase
 {
+    //список заказов
+    public ObservableCollection<Order> Orders { get; } = new ObservableCollection<Order>();
     
-    public ObservableCollection<Order> Orders { get; } = new ObservableCollection<Order>
+    //логика кнопки обнавления данных
+    private readonly CabinetMasterDbContext _context;
+    public OrdersViewModel(CabinetMasterDbContext context)
     {
-        new Order("Arseniy", "Stol", new DateTime(2026, 8, 31), 2000, 1800),
-        new Order("Dmitry", "Stul", new DateTime(2026, 9, 15), 1500, 1500),
-        new Order("Elena", "Shkaf", new DateTime(2026, 10, 05), 12000, 11000)
-    };
+        _context = context;
+    }
+    
     [ObservableProperty]
     private bool isBusy;
-
     [RelayCommand]
     private async Task LoadOrdersAsync()
     {
         IsBusy =  true;
-        await Task.Delay(2500);
-        
-        Orders.Add(new Order("Maxim", "Divan", new DateTime(2026, 11, 20), 25000, 23500));
+        Orders.Clear();
+        var orders_db = await _context.Orders.ToListAsync();
+        foreach (var zak in orders_db)
+        {
+            Orders.Add(zak);
+        }
         IsBusy =  false;
     }
     
+    
+    //логика кнопки редактировать
     [ObservableProperty]
     private bool isReadOnly = true;
 
@@ -45,35 +53,69 @@ public partial class OrdersViewModel : ViewModelBase
         {
             EditButtonText = "Редактировать";
             IsReadOnly = !IsReadOnly;
+            _context.SaveChangesAsync();
         }
     }
 
-
+    //логика для окошка удаления заказа
     [ObservableProperty]
     private bool showConfirmWindow = false;
     private Order? _orderToDelete;
-    [RelayCommand]
-    private void DeleteOrder(Order order)
+    
+    [RelayCommand] private void DeleteOrder(Order order)
     {
         _orderToDelete = order;
-        ShowConfirmWindow = true; // Меняем СВОЙСТВО (с большой буквы), чтобы UI обновился
+        ShowConfirmWindow = true;
     }
-
-    [RelayCommand]
-    private void ConfirmDelete() // Убрали параметр order, берем его из поля выше
+    
+    [RelayCommand] private async Task ConfirmDeleteAsync()
     {
         if (_orderToDelete != null)
         {
+            _context.Orders.Remove(_orderToDelete);
+            await _context.SaveChangesAsync();
+            
             Orders.Remove(_orderToDelete);
             _orderToDelete = null;
         }
-        ShowConfirmWindow = false; // С большой буквы
+        ShowConfirmWindow = false;
     }
-
-    [RelayCommand]
-    private void CancelDelete()
+    
+    [RelayCommand] private void CancelDelete()
     {
         _orderToDelete = null;
-        ShowConfirmWindow = false; // С большой буквы
+        ShowConfirmWindow = false;
+    }
+
+    
+    //логика отображения окошка с добавлением заказа
+    [ObservableProperty]
+    private AddOrderViewModel? addOrderContext;
+
+    [ObservableProperty]
+    private bool isAddOrderOverlayVisible;
+    
+    public async Task AddOrderToDbAsync(Order newOrder)
+    {
+        _context.Orders.Add(newOrder);
+        await _context.SaveChangesAsync();
+        Orders.Add(newOrder);
+    }
+    
+    private async void OnAddOrderClosed(Order? newOrder)
+    {
+        IsAddOrderOverlayVisible = false;
+        AddOrderContext = null;
+
+        if (newOrder != null)
+        {
+            await AddOrderToDbAsync(newOrder);
+        }
+    }
+    [RelayCommand]
+    private void OpenAddOrder()
+    {
+        AddOrderContext = new AddOrderViewModel(OnAddOrderClosed);
+        IsAddOrderOverlayVisible = true;
     }
 }

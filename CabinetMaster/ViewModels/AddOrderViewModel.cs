@@ -21,48 +21,65 @@ public partial class AddOrderViewModel : ViewModelBase
     private string priceString;
     [ObservableProperty]
     private string materialCostString;
-    
     public Order? CreatedOrder { get; private set; }
-    
     [ObservableProperty]
     private bool visibalErrorMessage = false;
-    
     private readonly ObservableCollection<Order> _targetOrdersCollection;
+    
+    private readonly Action<Order?> _linkOnAddOrderClosed;
 
-    public AddOrderViewModel(ObservableCollection<Order> targetCollection)
+    public AddOrderViewModel(Action<Order?> linkOnAddOrderClosed)
     {
-        _targetOrdersCollection = targetCollection;
+        _linkOnAddOrderClosed = linkOnAddOrderClosed;
         DeliveryDate = DateTime.Today.AddDays(7);
     }
-
     [RelayCommand]
-    private void Save(Window window)
+    private void Save()
     {
-        // 1. Валидация текстовых полей на пустоту
+        // проверка введеных данных
         if (string.IsNullOrWhiteSpace(ClientName) || string.IsNullOrWhiteSpace(ItemName))
         {
             VisibalErrorMessage = true;
             return;
         }
-        if (!decimal.TryParse(PriceString, out decimal price) || 
-            !decimal.TryParse(MaterialCostString, out decimal materialCost))
-        {
-            VisibalErrorMessage = true;
-            return;
-        }
-
+        
+        // проверка на непустую дату
         if (DeliveryDate == null)
         {
             VisibalErrorMessage = true;
             return;
         }
-        CreatedOrder = new Order(ClientName, ItemName, DeliveryDate.Value, price, materialCost);
-        
-        
-        _targetOrdersCollection.Add(CreatedOrder);
-        window?.Close();
+    
+        // проверка на цену
+        decimal? parsedPrice = null;
+        if (!string.IsNullOrWhiteSpace(PriceString))
+        {
+            if (!decimal.TryParse(PriceString, out decimal p) || p < 0)
+            {
+                VisibalErrorMessage = true;
+                return;
+            }
+            parsedPrice = p;
+        }
 
+        decimal? parsedMaterialCost = null;
+        if (!string.IsNullOrWhiteSpace(MaterialCostString))
+        {
+            if (!decimal.TryParse(MaterialCostString, out decimal mc) || mc < 0)
+            {
+                VisibalErrorMessage = true;
+                return;
+            }
+            parsedMaterialCost = mc;
+        }
+        
+        CreatedOrder = new Order(ClientName, ItemName, DeliveryDate.Value, parsedPrice, parsedMaterialCost);
+        _linkOnAddOrderClosed(CreatedOrder);
     }
-        
 
+    [RelayCommand]
+    private void Cancel()
+    {
+        _linkOnAddOrderClosed(null);
+    }
 }

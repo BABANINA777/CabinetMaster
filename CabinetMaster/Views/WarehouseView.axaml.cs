@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-
+using Avalonia.Markup.Xaml;
 
 namespace CabinetMaster.Views;
 
-public partial class OrdersView : UserControl
+public partial class WarehouseView : UserControl
 {
-    public OrdersView()
+    public WarehouseView()
     {
         InitializeComponent();
     }

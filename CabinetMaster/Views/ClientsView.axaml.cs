@@ -4,11 +4,10 @@ using Avalonia.Markup.Xaml;
 
 namespace CabinetMaster.Views;
 
-public partial class AddOrderWindow : Window
+public partial class ClientsView : UserControl
 {
-    public AddOrderWindow()
+    public ClientsView()
     {
         InitializeComponent();
     }
-    
 }

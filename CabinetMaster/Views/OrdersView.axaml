@@ -6,12 +6,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CabinetMaster.Views.OrdersView"
              x:DataType="vm:OrdersViewModel"
-             >
+             xmlns:sys="using:System">
     <Grid RowDefinitions="50, *">
         <!--Кнопки Функционал-->
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
-                <Button Content="Добавить заказ" Click="AddOrder_Click"/>
+                <Button Content="Добавить заказ" Command="{Binding OpenAddOrderCommand}"/>
                 <Button Content="Обновить" Command="{Binding LoadOrdersCommand}" />
                 <Button  Command="{Binding ToggleEditCommand}"
                          Content="{Binding EditButtonText}" />
@@ -38,7 +38,7 @@
             >
             
             <DataGrid.Columns>
-                <DataGridTextColumn Header="#" 
+                <DataGridTextColumn Header="№" 
                                     Binding="{Binding $parent[DataGridRow].Index}" 
                                     Width="Auto"
                                     IsReadOnly="True" 
@@ -89,7 +89,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
+        <!--Оверлей удаления-->
         <Grid Grid.Row="0" Grid.RowSpan="2" 
               Background="#A0000000" 
               IsVisible="{Binding ShowConfirmWindow}"
@@ -127,6 +127,75 @@
                                                          Command="{Binding CancelDeleteCommand}" 
                                                          HotKey="Escape"/> </StackPanel>
                 </StackPanel>
+            </Border>
+        </Grid>
+        <!--Оверлей добавления заказа-->
+        <Grid Grid.Row="0" Grid.RowSpan="2" 
+        Background="#A0000000" 
+        IsVisible="{Binding IsAddOrderOverlayVisible}"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch">
+    
+            <Border Background="{DynamicResource SystemRegionBrush}" 
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="1"
+                CornerRadius="8" 
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="20"
+                DataContext="{Binding AddOrderContext}">
+            
+                    <Grid RowDefinitions="*, Auto">
+                    <UniformGrid Grid.Row="0" Columns="5" Rows="1" Margin="20,20,20,10" KeyboardNavigation.TabNavigation="Cycle">
+                <StackPanel Margin="6,0">
+                    <Label Content="Имя клиента:" Target="{Binding ElementName=ClientNameTxt}"/>
+                    <TextBox x:Name="ClientNameTxt" Text="{Binding ClientName, Mode=TwoWay}" Watermark="Иван"/>
+                </StackPanel>
+
+                <StackPanel Margin="6,0">
+                    <Label Content="Название изделия:" Target="{Binding ElementName=ItemNameTxt}"/>
+                    <TextBox x:Name="ItemNameTxt" Text="{Binding ItemName, Mode=TwoWay}" Watermark="Шкаф-купе"/>
+                </StackPanel>
+
+                <StackPanel Margin="6,0">
+                    <Label Content="Цена продажи(руб) (необязательно):" Target="{Binding ElementName=PriceTxt}"/>
+                    <TextBox x:Name="PriceTxt" Text="{Binding PriceString, Mode=TwoWay}" Watermark="0.00"/>
+                </StackPanel>
+
+                <StackPanel Margin="6,0">
+                    <Label Content="Стоимость материалов(руб) (необязательно):" Target="{Binding ElementName=MaterialCostTxt}"/>
+                    <TextBox x:Name="MaterialCostTxt" Text="{Binding MaterialCostString, Mode=TwoWay}" Watermark="0.00"/>
+                </StackPanel>
+
+                <StackPanel Margin="6,0">
+                    <Label Content="Дата доставки:"/>
+                    <CalendarDatePicker SelectedDate="{Binding DeliveryDate, Mode=TwoWay}" 
+                                        DisplayDateStart="{Binding Source={x:Static sys:DateTime.Today}}"
+                                        HorizontalAlignment="Stretch"
+                                        PlaceholderText="Выберите дату..."/>
+                </StackPanel>
+                    </UniformGrid>
+         
+                    <Border Grid.Row="1" Background="{DynamicResource SystemRegionBrush}" Padding="20,12" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" BorderThickness="0,1,0,0">
+                    <Grid ColumnDefinitions="*, Auto">
+                    <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" IsVisible="{Binding VisibalErrorMessage}" Spacing="8">
+                        <TextBlock Text="⚠" Foreground="#D32F2F" FontWeight="Bold"/>
+                        <TextBlock Text="Пожалуйста, заполните все поля корректно." Foreground="#D32F2F" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                        <Button Content="Отмена" 
+                                Command="{Binding CancelCommand}" 
+                                Padding="24,8"/>
+                                
+                        <Button Content="Сохранить заказ" 
+                                Command="{Binding SaveCommand}" 
+                                Padding="24,8"
+                                Theme="{StaticResource AccentButtonTheme}"/> 
+                    </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Border>
         </Grid>
     </Grid>

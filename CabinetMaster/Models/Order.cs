@@ -1,10 +1,12 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CabinetMaster.Models;
 
 public partial class Order : ObservableObject
 {
+    //поля заказа
     public enum OrderStatus
     {
         Принят,
@@ -15,16 +17,28 @@ public partial class Order : ObservableObject
     public string ClientName { get; set; } = string.Empty;
     public string ItemName { get; set; } = string.Empty; // Например, "Кухня угловая"
     public DateTime OrderDate { get; } = DateTime.Now;
-    public DateTime DeliveryDate { get; set; }
-    [ObservableProperty][NotifyPropertyChangedFor(nameof(Profit))] private decimal price;          // Цена для покупателя
-    [ObservableProperty][NotifyPropertyChangedFor(nameof(Profit))] private decimal materialCost;    // Себестоимость материалов
+    public DateTime? DeliveryDate { get; set; }
+    [ObservableProperty][NotifyPropertyChangedFor(nameof(Profit))] private decimal? price;          // Цена для покупателя
+    [ObservableProperty][NotifyPropertyChangedFor(nameof(Profit))] private decimal? materialCost;    // Себестоимость материалов
     // Чистая прибыль будет считаться автоматически на лету
-    public decimal Profit => Price - MaterialCost; 
+    [NotMapped] public decimal? Profit {
+        get
+        {
+            if (price == null || materialCost == null)
+            {
+                return null;
+            }
+            return price.Value - materialCost.Value;
+        }
+        set;
+    }
+
     public OrderStatus[] AllStatuses => (OrderStatus[])Enum.GetValues(typeof(OrderStatus));
     [ObservableProperty] 
     private OrderStatus status = OrderStatus.Принят;
     
-    public Order(string clientName, string itemName, DateTime deliveryDate, decimal price, decimal materialCost)
+    //конструктор заказа
+    public Order(string clientName, string itemName, DateTime deliveryDate, decimal? price, decimal? materialCost)
     {
         ClientName = clientName;
         ItemName = itemName;

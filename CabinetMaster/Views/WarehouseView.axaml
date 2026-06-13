@@ -1,0 +1,192 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CabinetMaster.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CabinetMaster.Views.WarehouseView"
+             x:DataType="vm:WarehouseViewModel"
+             xmlns:sys="using:System">
+    <Grid RowDefinitions="50, *">
+        <!--Кнопки Функционал-->
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
+                <Button Content="Добавить материал" Command="{Binding OpenAddMaterialOverlayCommand}"/>
+                <Button Content="Обновить" Command="{Binding LoadMaterialsCommand}" />
+                <Button  Command="{Binding ToggleEditCommand}"
+                         Content="{Binding EditButtonText}" />
+            </StackPanel>
+            
+            <ProgressBar Minimum="0" 
+                         Maximum="100" 
+                         IsIndeterminate="True" 
+                         Height="3"
+                         IsVisible="{Binding IsBusy}"/>
+        </StackPanel>
+        
+        <!--Рабочая таблица-->
+        <DataGrid 
+            x:Name="MyDataGrid"
+            Grid.Row="1"
+            ItemsSource="{Binding Materials}" 
+            AutoGenerateColumns="False"
+            GridLinesVisibility="All"
+            CanUserSortColumns="True"
+            HeadersVisibility="All"
+            IsEnabled="{Binding !IsBusy}"
+            IsReadOnly="{Binding IsReadOnly}">
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="№" Binding="{Binding $parent[DataGridRow].Index}" Width="Auto" IsReadOnly="True" CanUserSort="False" />
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" SortMemberPath="Id"  IsReadOnly="True"/>
+                <DataGridTextColumn Header="Название материала" Binding="{Binding MaterialName}" Width="2*" SortMemberPath="MaterialName"/>
+                <DataGridTextColumn Header="Кол-во на складе" Binding="{Binding QuantityInStock}" Width="1.5*" SortMemberPath="QuantityInStock"/>
+                <DataGridTemplateColumn Header="Ед. изм." Width="100" SortMemberPath="Unit">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:CompileBindings="False">
+                            <Grid>
+                                <TextBlock Text="{Binding Unit}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           IsVisible="{Binding $parent[DataGrid].IsReadOnly}"/>
+                
+                                <AutoCompleteBox ItemsSource="{Binding $parent[DataGrid].DataContext.AvailableUnits}"
+                                                 Text="{Binding Unit, Mode=TwoWay}"
+                                                 FilterMode="Contains"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Center"
+                                                 IsVisible="{Binding !$parent[DataGrid].IsReadOnly}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Цена за ед." Binding="{Binding PricePerUnit}" Width="1.5*" SortMemberPath="PricePerUnit"/>
+                
+                <!--Колонка с кнопкой удаления-->
+                <DataGridTemplateColumn Header="Удалить" Width="Auto" IsVisible="{Binding !IsReadOnly}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="❌" 
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Foreground="Red"
+                                    FontWeight="Bold"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Command="{ReflectionBinding $parent[DataGrid].DataContext.DeleteMaterialCommand}"
+                                    CommandParameter="{Binding}"
+                                    IsVisible="{ReflectionBinding !$parent[DataGrid].DataContext.IsReadOnly}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            
+        </DataGrid>
+        
+        <!--Оверлей удаления-->
+        <Grid Grid.Row="0" Grid.RowSpan="2" 
+              Background="#A0000000" 
+              IsVisible="{Binding ShowConfirmWindow}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <Border Background="{DynamicResource SystemRegionBrush}" 
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8" 
+                    Padding="20" 
+                    Width="350"
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center">
+                
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Удаление Материалов" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="Вы уверены, что хотите удалить Материалы? Данное действие невозможно отменить." 
+                               TextWrapping="Wrap" 
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                        <Button Content="ОК" 
+                                Width="80" 
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding ConfirmDeleteCommand}"
+                                HotKey="Enter"/> <Button Content="Отмена" 
+                                                         Width="80" 
+                                                         HorizontalContentAlignment="Center"
+                                                         Command="{Binding CancelDeleteCommand}" 
+                                                         HotKey="Escape"/> </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+        <!--Оверлей добавления материала-->
+        <Grid Grid.Row="0" Grid.RowSpan="2" 
+        Background="#A0000000" 
+        IsVisible="{Binding IsAddMaterialOverlayVisible}"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch">
+            <Border Background="{DynamicResource SystemRegionBrush}" 
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="1"
+                CornerRadius="8" 
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="20">
+                <Grid RowDefinitions="*, Auto">
+                    <UniformGrid Grid.Row="0" Columns="5" Rows="1" Margin="20,20,20,10" KeyboardNavigation.TabNavigation="Cycle">
+                        
+                        <StackPanel Margin="6,0">
+                            <Label Content="Название материала:" Target="{Binding ElementName=MaterialNameTxt}"/>
+                            <TextBox x:Name="MaterialNameTxt" Text="{Binding MaterialName, Mode=TwoWay}" Watermark="Шпон"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Единица измерения:"/>
+                            <AutoCompleteBox ItemsSource="{Binding AvailableUnits}"
+                                             Text="{Binding Unit, Mode=TwoWay}"
+                                             Watermark="Например: шт."
+                                             FilterMode="Contains"
+                                             HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Количество:" Target="{Binding ElementName=PriceTxt}"/>
+                            <TextBox x:Name="PriceTxt" Text="{Binding QuantityInStockString, Mode=TwoWay}" Watermark="0.00"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Цена за штуку:" Target="{Binding ElementName=MaterialCostTxt}"/>
+                            <TextBox x:Name="MaterialCostTxt" Text="{Binding PricePerUnitString, Mode=TwoWay}" Watermark="0.00"/>
+                        </StackPanel>
+                    </UniformGrid>
+                    
+                    <Border Grid.Row="1" Background="{DynamicResource SystemRegionBrush}" Padding="20,12" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" BorderThickness="0,1,0,0">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" IsVisible="{Binding VisibalErrorMessage}" Spacing="8">
+                                <TextBlock Text="⚠" Foreground="#D32F2F" FontWeight="Bold"/>
+                                <TextBlock Text="Пожалуйста, заполните все поля корректно." Foreground="#D32F2F" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                <Button Content="Отмена" 
+                                        Command="{Binding CancelMaterialCommand}" 
+                                        Padding="24,8"/>
+                                
+                                <Button Content="Сохранить заказ" 
+                                        Command="{Binding SaveMaterialCommand}" 
+                                        Padding="24,8"
+                                        Theme="{StaticResource AccentButtonTheme}"/> 
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                </Grid>
+            </Border>
+        </Grid>
+        
+    </Grid>
+</UserControl>
