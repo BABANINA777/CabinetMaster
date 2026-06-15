@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace CabinetMaster.Views;
 
-public partial class ClientsView : UserControl
+public partial class ReportsView : UserControl
 {
-    public ClientsView()
+    public ReportsView()
     {
         InitializeComponent();
     }

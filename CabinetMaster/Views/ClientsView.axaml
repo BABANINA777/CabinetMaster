@@ -5,48 +5,165 @@
              xmlns:vm="using:CabinetMaster.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CabinetMaster.Views.ClientsView"
-             x:DataType="vm:ClientsViewModel"
-             xmlns:sys="using:System">
+             x:DataType="vm:ClientsViewModel">
     <Grid RowDefinitions="50, *">
         <!--Кнопки Функционал-->
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
+                <Button Content="Добавить клиента" Command="{Binding OpenAddClientOverlayCommand}" />
+                <Button Content="Обновить" Command="{Binding LoadClientsCommand}" />
+                <Button Command="{Binding ToggleEditCommand}" Content="{Binding EditButtonText}" />
+            </StackPanel>
+
+            <ProgressBar Minimum="0"
+                         Maximum="100"
+                         IsIndeterminate="True"
+                         Height="3"
+                         IsVisible="{Binding IsBusy}" />
         </StackPanel>
-        
+
         <!--Рабочая таблица-->
-        
-        <DataGrid 
+        <DataGrid
             x:Name="MyDataGrid"
             Grid.Row="1"
-            ItemsSource="{Binding Clients}" 
+            ItemsSource="{Binding Clients}"
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
             CanUserSortColumns="True"
             HeadersVisibility="All"
             IsEnabled="{Binding !IsBusy}"
             IsReadOnly="{Binding IsReadOnly}">
-            
+
             <DataGrid.Columns>
-                
+                <DataGridTextColumn Header="№" Binding="{Binding $parent[DataGridRow].Index}" Width="Auto"
+                                    IsReadOnly="True" CanUserSort="False" />
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" IsReadOnly="True" />
+                <DataGridTextColumn Header="Имя клиента" Binding="{Binding ClientName}" Width="2*" />
+                <DataGridTextColumn Header="Телефон" Binding="{Binding PhoneNumber}" Width="1.5*" />
+                <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="3*" />
+
+                <!--Колонка с кнопкой удаления-->
+                <DataGridTemplateColumn Header="Удалить" Width="Auto" IsVisible="{Binding !IsReadOnly}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="❌"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Foreground="Red"
+                                    FontWeight="Bold"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Command="{ReflectionBinding $parent[DataGrid].DataContext.DeleteClientCommand}"
+                                    CommandParameter="{Binding}"
+                                    IsVisible="{ReflectionBinding !$parent[DataGrid].DataContext.IsReadOnly}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
-            
+
         </DataGrid>
-        
+
         <!--Оверлей удаления-->
-        <Grid Grid.Row="0" Grid.RowSpan="2" 
-              Background="#A0000000" 
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              Background="#A0000000"
               IsVisible="{Binding ShowConfirmWindow}"
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch">
+            <Border Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Width="350"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Удаление Клиента"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center" />
+
+                    <TextBlock Text="Удалить данные клиента? Данное действие невозможно отменить."
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center" />
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                        <Button Content="ОК"
+                                Width="80"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding ConfirmDeleteCommand}"
+                                HotKey="Enter" />
+                        <Button Content="Отмена"
+                                Width="80"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding CancelDeleteCommand}"
+                                HotKey="Escape" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </Grid>
-        
-        <!--Оверлей добавления заказа-->
-        <Grid Grid.Row="0" Grid.RowSpan="2" 
-        Background="#A0000000" 
-        IsVisible="{Binding IsAddOrderOverlayVisible}"
-        HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch">
+
+        <!--Оверлей добавления Клиента-->
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              Background="#A0000000"
+              IsVisible="{Binding IsAddClientOverlayVisible}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <Border Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="20"
+                    Width="600">
+                <Grid RowDefinitions="*, Auto">
+                    <UniformGrid Grid.Row="0" Columns="3" Rows="1" Margin="20,20,20,10"
+                                 KeyboardNavigation.TabNavigation="Cycle">
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Имя клиента:" />
+                            <TextBox Text="{Binding NewClientName, Mode=TwoWay}" Watermark="Иванов Иван" />
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Телефон:" />
+                            <TextBox Text="{Binding NewPhoneNumber, Mode=TwoWay}" Watermark="+7 (999) 000-00-00" />
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Комментарий:" />
+                            <TextBox Text="{Binding NewComment, Mode=TwoWay}" Watermark="Особые пожелания..." />
+                        </StackPanel>
+                    </UniformGrid>
+
+                    <Border Grid.Row="1" Background="{DynamicResource SystemRegionBrush}" Padding="20,12"
+                            BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" BorderThickness="0,1,0,0">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center"
+                                        IsVisible="{Binding VisibalErrorMessage}" Spacing="8">
+                                <TextBlock Text="⚠" Foreground="#D32F2F" FontWeight="Bold" />
+                                <TextBlock Text="Заполните обязательные поля (Имя, Телефон)." Foreground="#D32F2F"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                <Button Content="Отмена"
+                                        Command="{Binding CancelClientCommand}"
+                                        Padding="24,8" />
+
+                                <Button Content="Сохранить"
+                                        Command="{Binding SaveClientCommand}"
+                                        Padding="24,8"
+                                        Theme="{StaticResource AccentButtonTheme}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
         </Grid>
-        
+
     </Grid>
 </UserControl>

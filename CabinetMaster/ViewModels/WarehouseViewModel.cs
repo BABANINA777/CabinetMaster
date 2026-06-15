@@ -9,41 +9,65 @@ namespace CabinetMaster.ViewModels;
 
 public partial class WarehouseViewModel : ViewModelBase
 {
-    //список заказов
-    public ObservableCollection<Material> Materials { get; } = new ObservableCollection<Material>();
-    
     //логика кнопки обнавления данных
     private readonly CabinetMasterDbContext _context;
+    private Material? _materialToDelete;
+    [ObservableProperty] private string editButtonText = "Редактировать";
+
+    //логика отображения окошка с добавлением заказа
+    [ObservableProperty] private bool isAddMaterialOverlayVisible;
+
+    [ObservableProperty] private bool isBusy;
+
+    //логика кнопки редактировать
+    [ObservableProperty] private bool isReadOnly = true;
+
+    [ObservableProperty] private string materialName;
+    [ObservableProperty] private string pricePerUnitString;
+    [ObservableProperty] private string quantityInStockString;
+
+
+    //логика для окошка удаления заказа
+    [ObservableProperty] private bool showConfirmWindow;
+    [ObservableProperty] private string unit;
+
+    [ObservableProperty] private bool visibalErrorMessage;
+
     public WarehouseViewModel(CabinetMasterDbContext context)
     {
         _context = context;
     }
-    
-    [ObservableProperty]
-    private bool isBusy;
+
+    //список заказов
+    public ObservableCollection<Material> Materials { get; } = new();
+
+    public string[] AvailableUnits { get; } = new[]
+    {
+        "шт.",
+        "пог. м",
+        "кв. м",
+        "лист",
+        "комплект",
+        "упаковка"
+    };
+
     [RelayCommand]
     private async Task LoadMaterialsAsync()
     {
-        IsBusy =  true;
+        IsBusy = true;
         Materials.Clear();
         var Materials_db = await _context.Materials.ToListAsync();
-        foreach (var mat in Materials_db)
-        {
-            Materials.Add(mat);
-        }
-        IsBusy =  false;
+        foreach (var mat in Materials_db) Materials.Add(mat);
+        IsBusy = false;
     }
-    
-    //логика кнопки редактировать
-    [ObservableProperty] private bool isReadOnly = true;
-    [ObservableProperty] private string editButtonText = "Редактировать";
+
     [RelayCommand]
     private async Task ToggleEdit()
     {
         if (EditButtonText == "Редактировать")
         {
             EditButtonText = "Готово";
-            IsReadOnly = !IsReadOnly; 
+            IsReadOnly = !IsReadOnly;
         }
         else
         {
@@ -52,13 +76,9 @@ public partial class WarehouseViewModel : ViewModelBase
             await _context.SaveChangesAsync();
         }
     }
-    
-    
-    //логика для окошка удаления заказа
-    [ObservableProperty] private bool showConfirmWindow = false;
-    private Material? _materialToDelete;
-    
-    [RelayCommand] private void DeleteMaterial(Material material)
+
+    [RelayCommand]
+    private void DeleteMaterial(Material material)
     {
         _materialToDelete = material;
         ShowConfirmWindow = true;
@@ -71,10 +91,11 @@ public partial class WarehouseViewModel : ViewModelBase
         {
             _context.Materials.Remove(_materialToDelete);
             await _context.SaveChangesAsync();
-            
+
             Materials.Remove(_materialToDelete);
             _materialToDelete = null;
         }
+
         ShowConfirmWindow = false;
     }
 
@@ -85,49 +106,41 @@ public partial class WarehouseViewModel : ViewModelBase
         ShowConfirmWindow = false;
     }
 
-    //логика отображения окошка с добавлением заказа
-    [ObservableProperty] private bool isAddMaterialOverlayVisible = false;
-    
-    [ObservableProperty] private string materialName;
-    [ObservableProperty] private string unit;
-    public string[] AvailableUnits { get; } = new[] 
-    { 
-        "шт.", 
-        "пог. м", 
-        "кв. м", 
-        "лист", 
-        "комплект",
-        "упаковка"
-    };
-    [ObservableProperty] private string quantityInStockString;
-    [ObservableProperty] private string pricePerUnitString;
-    
-    [ObservableProperty] private bool visibalErrorMessage;
-    
     public async Task AddMaterialToDbAsync(Material newMaterial)
     {
         _context.Materials.Add(newMaterial);
         await _context.SaveChangesAsync();
         Materials.Add(newMaterial);
     }
-    [RelayCommand] private void OpenAddMaterialOverlay()
+
+    [RelayCommand]
+    private void OpenAddMaterialOverlay()
     {
         IsAddMaterialOverlayVisible = true;
     }
-    [RelayCommand] private void SaveMaterial()
+
+    [RelayCommand]
+    private void SaveMaterial()
     {
-        Material new_material = new Material();
+        var new_material = new Material();
         if (string.IsNullOrWhiteSpace(MaterialName) || string.IsNullOrWhiteSpace(Unit))
         {
             VisibalErrorMessage = true;
             return;
         }
-        if (!(decimal.TryParse(QuantityInStockString, out decimal result1) && decimal.TryParse(PricePerUnitString, out decimal result2)))
+
+        if (!(decimal.TryParse(QuantityInStockString, out var result1) &&
+              decimal.TryParse(PricePerUnitString, out var result2)))
         {
             VisibalErrorMessage = true;
             return;
         }
-        if(!(result1>0 && result2>0)){VisibalErrorMessage = true; return;}
+
+        if (!(result1 > 0 && result2 > 0))
+        {
+            VisibalErrorMessage = true;
+            return;
+        }
 
         new_material.MaterialName = MaterialName;
         new_material.QuantityInStock = result1;
@@ -136,7 +149,9 @@ public partial class WarehouseViewModel : ViewModelBase
         AddMaterialToDbAsync(new_material);
         IsAddMaterialOverlayVisible = false;
     }
-    [RelayCommand] private void CancelMaterial()
+
+    [RelayCommand]
+    private void CancelMaterial()
     {
         IsAddMaterialOverlayVisible = false;
     }

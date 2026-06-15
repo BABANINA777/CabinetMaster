@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CabinetMaster.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CabinetMaster.Views.ReportsView"
+             x:DataType="vm:ReportsViewModel">
+    <Grid RowDefinitions="50, *">
+        <!--Кнопки Функционал-->
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
+                <Button Content="Обновить" Command="{Binding LoadReportCommand}" />
+                <Button Content="Экспорт в Exel" Command="{Binding ExportToExcelCommand}"
+                        CommandParameter="{Binding $parent[Window]}" />
+            </StackPanel>
+
+            <ProgressBar Minimum="0"
+                         Maximum="100"
+                         IsIndeterminate="True"
+                         Height="3"
+                         IsVisible="{Binding IsBusy}" />
+        </StackPanel>
+        <!--Карточки с данными-->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="10">
+            <Border BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="10"
+                    Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="ЧИСТАЯ ПРИБЫЛЬ" Foreground="Gray" FontSize="12" />
+                    <TextBlock Text="{Binding NetProfit, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="24" />
+                </StackPanel>
+            </Border>
+
+            <Border BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="10"
+                    Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="ОБЩАЯ ВЫРУЧКА" Foreground="Gray" FontSize="12" />
+                    <TextBlock Text="{Binding TotalRevenue, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="24" />
+                </StackPanel>
+            </Border>
+
+            <Border BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="10"
+                    Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="ОБЩИЕ ИЗДЕРЖКИ" Foreground="Gray" FontSize="12" />
+                    <TextBlock Text="{Binding TotalCosts, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="24" />
+                </StackPanel>
+            </Border>
+
+            <Border BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="10"
+                    Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="ЗАВЕРШЕННЫЕ ЗАКАЗЫ" Foreground="Gray" FontSize="12" />
+                    <TextBlock Text="{Binding CompletedOrdersCount}" FontWeight="Bold" FontSize="24" />
+                </StackPanel>
+            </Border>
+
+            <Border BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="10"
+                    Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="АКТИВНЫЕ ЗАКАЗЫ" Foreground="Gray" FontSize="12" />
+                    <TextBlock Text="{Binding ActiveOrdersCount}" FontWeight="Bold" FontSize="24" />
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+    </Grid>
+</UserControl>

@@ -1,6 +1,4 @@
-using Avalonia;
 using Avalonia.Controls;
-
 
 namespace CabinetMaster.Views;
 

@@ -11,70 +11,76 @@
         <!--Кнопки Функционал-->
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
-                <Button Content="Добавить заказ" Command="{Binding OpenAddOrderCommand}"/>
+                <Button Content="Добавить заказ" Command="{Binding OpenAddOrderCommand}" />
                 <Button Content="Обновить" Command="{Binding LoadOrdersCommand}" />
-                <Button  Command="{Binding ToggleEditCommand}"
-                         Content="{Binding EditButtonText}" />
+                <Button Command="{Binding ToggleEditCommand}"
+                        Content="{Binding EditButtonText}" />
             </StackPanel>
-            
-            <ProgressBar Minimum="0" 
-                         Maximum="100" 
-                         IsIndeterminate="True" 
+
+            <ProgressBar Minimum="0"
+                         Maximum="100"
+                         IsIndeterminate="True"
                          Height="3"
-                         IsVisible="{Binding IsBusy}"/>
+                         IsVisible="{Binding IsBusy}" />
         </StackPanel>
-        
+
         <!--Рабочая таблица-->
-        <DataGrid 
+        <DataGrid
             x:Name="MyDataGrid"
             Grid.Row="1"
-            ItemsSource="{Binding Orders}" 
+            ItemsSource="{Binding Orders}"
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
             CanUserSortColumns="True"
             HeadersVisibility="All"
             IsEnabled="{Binding !IsBusy}"
-            IsReadOnly="{Binding IsReadOnly}"
-            >
-            
+            IsReadOnly="{Binding IsReadOnly}">
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="№" 
-                                    Binding="{Binding $parent[DataGridRow].Index}" 
+                <DataGridTextColumn Header="№"
+                                    Binding="{Binding $parent[DataGridRow].Index}"
                                     Width="Auto"
-                                    IsReadOnly="True" 
+                                    IsReadOnly="True"
                                     CanUserSort="False" />
-                
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" SortMemberPath="Id"  IsReadOnly="True"/>
-                <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="2*" SortMemberPath="ClientName"  />
-                <DataGridTextColumn Header="Изделие" Binding="{Binding ItemName}" Width="2*" SortMemberPath="ItemName"  />
-                <DataGridTextColumn Header="Дата Заказа" Binding="{Binding OrderDate}" Width="Auto" SortMemberPath="OrderDate"  />
-                <DataGridTextColumn Header="Дата Сдачи" Binding="{Binding DeliveryDate}" Width="Auto" SortMemberPath="DeliveryDate"  />
-                <DataGridTextColumn Header="Стоимость (руб)" Binding="{Binding Price}" Width="1*" SortMemberPath="Price" IsReadOnly="False" />
-                <DataGridTextColumn Header="Себестоимость (руб)" Binding="{Binding MaterialCost}" Width="1*" SortMemberPath="MaterialCost"  />
-                <DataGridTextColumn Header="Чистая прибыль (руб)" Binding="{Binding Profit}" IsReadOnly="True" Width="1*" SortMemberPath="Profit" />
+
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" SortMemberPath="Id"
+                                    IsReadOnly="True" />
+                <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="2*"
+                                    SortMemberPath="ClientName" />
+                <DataGridTextColumn Header="Изделие" Binding="{Binding ItemName}" Width="2*" SortMemberPath="ItemName" />
+                <DataGridTextColumn Header="Дата Заказа" Binding="{Binding OrderDate}" Width="Auto"
+                                    SortMemberPath="OrderDate" />
+                <DataGridTextColumn Header="Дата Сдачи" Binding="{Binding DeliveryDate}" Width="Auto"
+                                    SortMemberPath="DeliveryDate" />
+                <DataGridTextColumn Header="Стоимость (руб)" Binding="{Binding Price}" Width="1*"
+                                    SortMemberPath="Price" IsReadOnly="False" />
+                <DataGridTextColumn Header="Себестоимость (руб)" Binding="{Binding MaterialCost}" Width="1*"
+                                    SortMemberPath="MaterialCost" />
+                <DataGridTextColumn Header="Чистая прибыль (руб)" Binding="{Binding Profit}" IsReadOnly="True"
+                                    Width="1*" SortMemberPath="Profit" />
                 <DataGridTemplateColumn Header="Статус" Width="1*" SortMemberPath="Status">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:CompileBindings="False">
                             <Grid>
-                                <TextBlock Text="{Binding Status}" 
-                                           VerticalAlignment="Center" 
+                                <TextBlock Text="{Binding Status}"
+                                           VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
-                                           IsVisible="{Binding $parent[DataGrid].IsReadOnly}"/>
-                
+                                           IsVisible="{Binding $parent[DataGrid].IsReadOnly}" />
+
                                 <ComboBox ItemsSource="{Binding AllStatuses}"
                                           SelectedItem="{Binding Status}"
                                           HorizontalAlignment="Stretch"
                                           VerticalAlignment="Center"
-                                          IsVisible="{Binding !$parent[DataGrid].IsReadOnly}"/>
+                                          IsVisible="{Binding !$parent[DataGrid].IsReadOnly}" />
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTemplateColumn Header="Удалить" Width="Auto" IsVisible="{Binding !IsReadOnly}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="❌" 
+                            <Button Content="❌"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     Foreground="Red"
@@ -83,121 +89,129 @@
                                     HorizontalAlignment="Center"
                                     Command="{ReflectionBinding $parent[DataGrid].DataContext.DeleteOrderCommand}"
                                     CommandParameter="{Binding}"
-                                    IsVisible="{ReflectionBinding !$parent[DataGrid].DataContext.IsReadOnly}"/>
+                                    IsVisible="{ReflectionBinding !$parent[DataGrid].DataContext.IsReadOnly}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <!--Оверлей удаления-->
-        <Grid Grid.Row="0" Grid.RowSpan="2" 
-              Background="#A0000000" 
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              Background="#A0000000"
               IsVisible="{Binding ShowConfirmWindow}"
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch">
-            
-            <Border Background="{DynamicResource SystemRegionBrush}" 
+
+            <Border Background="{DynamicResource SystemRegionBrush}"
                     BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
                     BorderThickness="1"
-                    CornerRadius="8" 
-                    Padding="20" 
+                    CornerRadius="8"
+                    Padding="20"
                     Width="350"
-                    HorizontalAlignment="Center" 
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center">
-                
+
                 <StackPanel Spacing="15">
-                    <TextBlock Text="Удаление заказа" 
-                               FontSize="16" 
-                               FontWeight="Bold" 
-                               HorizontalAlignment="Center"/>
-                    
-                    <TextBlock Text="Вы уверены, что хотите удалить этот заказ? Данное действие невозможно отменить." 
-                               TextWrapping="Wrap" 
+                    <TextBlock Text="Удаление заказа"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center" />
+
+                    <TextBlock Text="Вы уверены, что хотите удалить этот заказ? Данное действие невозможно отменить."
+                               TextWrapping="Wrap"
                                HorizontalAlignment="Center"
-                               TextAlignment="Center"/>
-                    
+                               TextAlignment="Center" />
+
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-                        <Button Content="ОК" 
-                                Width="80" 
+                        <Button Content="ОК"
+                                Width="80"
                                 HorizontalContentAlignment="Center"
                                 Command="{Binding ConfirmDeleteCommand}"
-                                HotKey="Enter"/> <Button Content="Отмена" 
-                                                         Width="80" 
-                                                         HorizontalContentAlignment="Center"
-                                                         Command="{Binding CancelDeleteCommand}" 
-                                                         HotKey="Escape"/> </StackPanel>
+                                HotKey="Enter" />
+                        <Button Content="Отмена"
+                                Width="80"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding CancelDeleteCommand}"
+                                HotKey="Escape" />
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
         <!--Оверлей добавления заказа-->
-        <Grid Grid.Row="0" Grid.RowSpan="2" 
-        Background="#A0000000" 
-        IsVisible="{Binding IsAddOrderOverlayVisible}"
-        HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch">
-    
-            <Border Background="{DynamicResource SystemRegionBrush}" 
-                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                BorderThickness="1"
-                CornerRadius="8" 
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Margin="20"
-                DataContext="{Binding AddOrderContext}">
-            
-                    <Grid RowDefinitions="*, Auto">
-                    <UniformGrid Grid.Row="0" Columns="5" Rows="1" Margin="20,20,20,10" KeyboardNavigation.TabNavigation="Cycle">
-                <StackPanel Margin="6,0">
-                    <Label Content="Имя клиента:" Target="{Binding ElementName=ClientNameTxt}"/>
-                    <TextBox x:Name="ClientNameTxt" Text="{Binding ClientName, Mode=TwoWay}" Watermark="Иван"/>
-                </StackPanel>
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              Background="#A0000000"
+              IsVisible="{Binding IsAddOrderOverlayVisible}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
 
-                <StackPanel Margin="6,0">
-                    <Label Content="Название изделия:" Target="{Binding ElementName=ItemNameTxt}"/>
-                    <TextBox x:Name="ItemNameTxt" Text="{Binding ItemName, Mode=TwoWay}" Watermark="Шкаф-купе"/>
-                </StackPanel>
+            <Border Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="20"
+                    DataContext="{Binding AddOrderContext}">
 
-                <StackPanel Margin="6,0">
-                    <Label Content="Цена продажи(руб) (необязательно):" Target="{Binding ElementName=PriceTxt}"/>
-                    <TextBox x:Name="PriceTxt" Text="{Binding PriceString, Mode=TwoWay}" Watermark="0.00"/>
-                </StackPanel>
+                <Grid RowDefinitions="*, Auto">
+                    <UniformGrid Grid.Row="0" Columns="5" Rows="1" Margin="20,20,20,10"
+                                 KeyboardNavigation.TabNavigation="Cycle">
+                        <StackPanel Margin="6,0">
+                            <Label Content="Имя клиента:" Target="{Binding ElementName=ClientNameTxt}" />
+                            <TextBox x:Name="ClientNameTxt" Text="{Binding ClientName, Mode=TwoWay}" Watermark="Иван" />
+                        </StackPanel>
 
-                <StackPanel Margin="6,0">
-                    <Label Content="Стоимость материалов(руб) (необязательно):" Target="{Binding ElementName=MaterialCostTxt}"/>
-                    <TextBox x:Name="MaterialCostTxt" Text="{Binding MaterialCostString, Mode=TwoWay}" Watermark="0.00"/>
-                </StackPanel>
+                        <StackPanel Margin="6,0">
+                            <Label Content="Название изделия:" Target="{Binding ElementName=ItemNameTxt}" />
+                            <TextBox x:Name="ItemNameTxt" Text="{Binding ItemName, Mode=TwoWay}" Watermark="Шкаф-купе" />
+                        </StackPanel>
 
-                <StackPanel Margin="6,0">
-                    <Label Content="Дата доставки:"/>
-                    <CalendarDatePicker SelectedDate="{Binding DeliveryDate, Mode=TwoWay}" 
-                                        DisplayDateStart="{Binding Source={x:Static sys:DateTime.Today}}"
-                                        HorizontalAlignment="Stretch"
-                                        PlaceholderText="Выберите дату..."/>
-                </StackPanel>
+                        <StackPanel Margin="6,0">
+                            <Label Content="Цена продажи(руб) (необязательно):" Target="{Binding ElementName=PriceTxt}" />
+                            <TextBox x:Name="PriceTxt" Text="{Binding PriceString, Mode=TwoWay}" Watermark="0.00" />
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Стоимость материалов(руб) (необязательно):"
+                                   Target="{Binding ElementName=MaterialCostTxt}" />
+                            <TextBox x:Name="MaterialCostTxt" Text="{Binding MaterialCostString, Mode=TwoWay}"
+                                     Watermark="0.00" />
+                        </StackPanel>
+
+                        <StackPanel Margin="6,0">
+                            <Label Content="Дата доставки:" />
+                            <CalendarDatePicker SelectedDate="{Binding DeliveryDate, Mode=TwoWay}"
+                                                DisplayDateStart="{Binding Source={x:Static sys:DateTime.Today}}"
+                                                HorizontalAlignment="Stretch"
+                                                PlaceholderText="Выберите дату..." />
+                        </StackPanel>
                     </UniformGrid>
-         
-                    <Border Grid.Row="1" Background="{DynamicResource SystemRegionBrush}" Padding="20,12" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" BorderThickness="0,1,0,0">
-                    <Grid ColumnDefinitions="*, Auto">
-                    <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" IsVisible="{Binding VisibalErrorMessage}" Spacing="8">
-                        <TextBlock Text="⚠" Foreground="#D32F2F" FontWeight="Bold"/>
-                        <TextBlock Text="Пожалуйста, заполните все поля корректно." Foreground="#D32F2F" FontWeight="SemiBold"/>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
-                        <Button Content="Отмена" 
-                                Command="{Binding CancelCommand}" 
-                                Padding="24,8"/>
-                                
-                        <Button Content="Сохранить заказ" 
-                                Command="{Binding SaveCommand}" 
-                                Padding="24,8"
-                                Theme="{StaticResource AccentButtonTheme}"/> 
-                    </StackPanel>
+
+                    <Border Grid.Row="1" Background="{DynamicResource SystemRegionBrush}" Padding="20,12"
+                            BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" BorderThickness="0,1,0,0">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center"
+                                        IsVisible="{Binding VisibalErrorMessage}" Spacing="8">
+                                <TextBlock Text="⚠" Foreground="#D32F2F" FontWeight="Bold" />
+                                <TextBlock Text="Пожалуйста, заполните все поля корректно." Foreground="#D32F2F"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                <Button Content="Отмена"
+                                        Command="{Binding CancelCommand}"
+                                        Padding="24,8" />
+
+                                <Button Content="Сохранить заказ"
+                                        Command="{Binding SaveCommand}"
+                                        Padding="24,8"
+                                        Theme="{StaticResource AccentButtonTheme}" />
+                            </StackPanel>
                         </Grid>
                     </Border>
                 </Grid>
             </Border>
         </Grid>
     </Grid>
-    
+
 </UserControl>

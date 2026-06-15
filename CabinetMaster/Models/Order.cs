@@ -1,42 +1,27 @@
 using System;
-using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CabinetMaster.Models;
 
+//поля заказа
+public enum OrderStatus
+{
+    Принят,
+    В_Производстве,
+    Готов
+}
+
 public partial class Order : ObservableObject
 {
-    //поля заказа
-    public enum OrderStatus
-    {
-        Принят,
-        В_Производстве,
-        Готов
-    }
-    public int Id { get; set; }
-    public string ClientName { get; set; } = string.Empty;
-    public string ItemName { get; set; } = string.Empty; // Например, "Кухня угловая"
-    public DateTime OrderDate { get; } = DateTime.Now;
-    public DateTime? DeliveryDate { get; set; }
-    [ObservableProperty][NotifyPropertyChangedFor(nameof(Profit))] private decimal? price;          // Цена для покупателя
-    [ObservableProperty][NotifyPropertyChangedFor(nameof(Profit))] private decimal? materialCost;    // Себестоимость материалов
-    // Чистая прибыль будет считаться автоматически на лету
-    [NotMapped] public decimal? Profit {
-        get
-        {
-            if (price == null || materialCost == null)
-            {
-                return null;
-            }
-            return price.Value - materialCost.Value;
-        }
-        set;
-    }
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Profit))]
+    private decimal? materialCost; // Себестоимость материалов
 
-    public OrderStatus[] AllStatuses => (OrderStatus[])Enum.GetValues(typeof(OrderStatus));
-    [ObservableProperty] 
-    private OrderStatus status = OrderStatus.Принят;
-    
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Profit))]
+    private decimal? price; // Цена для покупателя
+
+    [ObservableProperty] private OrderStatus status = OrderStatus.Принят;
+
     //конструктор заказа
     public Order(string clientName, string itemName, DateTime deliveryDate, decimal? price, decimal? materialCost)
     {
@@ -47,5 +32,29 @@ public partial class Order : ObservableObject
         Price = price;
         MaterialCost = materialCost;
     }
-    public Order() { }
+
+    public Order()
+    {
+    }
+
+    public int Id { get; set; }
+    public string ClientName { get; set; } = string.Empty;
+    public string ItemName { get; set; } = string.Empty; // Например, "Кухня угловая"
+    public DateTime OrderDate { get; } = DateTime.Now;
+
+    public DateTime? DeliveryDate { get; set; }
+
+    // Чистая прибыль будет считаться автоматически на лету
+    [NotMapped]
+    public decimal? Profit
+    {
+        get
+        {
+            if (price == null || materialCost == null) return null;
+            return price.Value - materialCost.Value;
+        }
+        set;
+    }
+
+    public OrderStatus[] AllStatuses => (OrderStatus[])Enum.GetValues(typeof(OrderStatus));
 }
