@@ -27,6 +27,7 @@
             x:Name="MyDataGrid"
             Grid.Row="1"
             ItemsSource="{Binding Clients}"
+            x:CompileBindings="False"
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
             CanUserSortColumns="True"
@@ -38,7 +39,38 @@
                 <DataGridTextColumn Header="№" Binding="{Binding $parent[DataGridRow].Index}" Width="Auto"
                                     IsReadOnly="True" CanUserSort="False" />
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" IsReadOnly="True" />
-                <DataGridTextColumn Header="Имя клиента" Binding="{Binding ClientName}" Width="2*" />
+                <DataGridTextColumn Binding="{Binding ClientName}" Width="2*" SortMemberPath="ClientName">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <DockPanel LastChildFill="True" 
+                                           IsVisible="{Binding !$parent[DataGrid].DataContext.IsActiveClientSearch}">
+                                    <Button DockPanel.Dock="Right" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchClientModeCommand}"
+                                            Content="🔍" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                    <TextBlock Text="Имя клиента" 
+                                               FontWeight="Bold" 
+                                               VerticalAlignment="Center"/>
+                                </DockPanel>
+                                
+                                <Grid ColumnDefinitions="*, Auto" 
+                                      IsVisible="{Binding $parent[DataGrid].DataContext.IsActiveClientSearch}">
+                                    <TextBox Grid.Column="0" 
+                                             Text="{Binding $parent[DataGrid].DataContext.InputClient, Mode=TwoWay}" 
+                                             PlaceholderText="Поиск..." 
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchClientModeCommand}"
+                                            Content="❌" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Телефон" Binding="{Binding PhoneNumber}" Width="1.5*" />
                 <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="3*" />
 
@@ -125,17 +157,17 @@
 
                         <StackPanel Margin="6,0">
                             <Label Content="Имя клиента:" />
-                            <TextBox Text="{Binding NewClientName, Mode=TwoWay}" Watermark="Иванов Иван" />
+                            <TextBox Text="{Binding NewClientName, Mode=TwoWay}" PlaceholderText="Иванов Иван" />
                         </StackPanel>
 
                         <StackPanel Margin="6,0">
                             <Label Content="Телефон:" />
-                            <TextBox Text="{Binding NewPhoneNumber, Mode=TwoWay}" Watermark="+7 (999) 000-00-00" />
+                            <TextBox Text="{Binding NewPhoneNumber, Mode=TwoWay}" PlaceholderText="+7 (999) 000-00-00" />
                         </StackPanel>
 
                         <StackPanel Margin="6,0">
                             <Label Content="Комментарий:" />
-                            <TextBox Text="{Binding NewComment, Mode=TwoWay}" Watermark="Особые пожелания..." />
+                            <TextBox Text="{Binding NewComment, Mode=TwoWay}" PlaceholderText="Особые пожелания..." />
                         </StackPanel>
                     </UniformGrid>
 

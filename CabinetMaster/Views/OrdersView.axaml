@@ -34,20 +34,85 @@
             CanUserSortColumns="True"
             HeadersVisibility="All"
             IsEnabled="{Binding !IsBusy}"
-            IsReadOnly="{Binding IsReadOnly}">
+            IsReadOnly="{Binding IsReadOnly}"
+            x:CompileBindings="False">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№"
                                     Binding="{Binding $parent[DataGridRow].Index}"
                                     Width="Auto"
                                     IsReadOnly="True"
-                                    CanUserSort="False" />
+                                    CanUserSort="False" 
+                                    />
 
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" SortMemberPath="Id"
                                     IsReadOnly="True" />
-                <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="2*"
-                                    SortMemberPath="ClientName" />
-                <DataGridTextColumn Header="Изделие" Binding="{Binding ItemName}" Width="2*" SortMemberPath="ItemName" />
+                <DataGridTextColumn Binding="{Binding ClientName}" Width="2*"
+                                    SortMemberPath="ClientName">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <DockPanel LastChildFill="True" 
+                                           IsVisible="{Binding !$parent[DataGrid].DataContext.IsActiveClientSearch}">
+                                    <Button DockPanel.Dock="Right" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchClientModeCommand}"
+                                            Content="🔍" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                    <TextBlock Text="Клиент" 
+                                               FontWeight="Bold" 
+                                               VerticalAlignment="Center"/>
+                                </DockPanel>
+                                
+                                <Grid ColumnDefinitions="*, Auto" 
+                                      IsVisible="{Binding $parent[DataGrid].DataContext.IsActiveClientSearch}">
+                                    <TextBox Grid.Column="0" 
+                                             Text="{Binding $parent[DataGrid].DataContext.InputClient, Mode=TwoWay}" 
+                                             PlaceholderText="Поиск..." 
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchClientModeCommand}"
+                                            Content="❌" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding ItemName}" Width="2*"
+                                    SortMemberPath="ItemName">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <DockPanel LastChildFill="True" 
+                                           IsVisible="{Binding !$parent[DataGrid].DataContext.IsActiveOrderSearch}">
+                                    <Button DockPanel.Dock="Right" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchOrderModeCommand}"
+                                            Content="🔍" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                    <TextBlock Text="Изделие" 
+                                               FontWeight="Bold" 
+                                               VerticalAlignment="Center"/>
+                                </DockPanel>
+                                
+                                <Grid ColumnDefinitions="*, Auto" 
+                                      IsVisible="{Binding $parent[DataGrid].DataContext.IsActiveOrderSearch}">
+                                    <TextBox Grid.Column="0" 
+                                             Text="{Binding $parent[DataGrid].DataContext.InputOrder, Mode=TwoWay}" 
+                                             PlaceholderText="Поиск..." 
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchOrderModeCommand}"
+                                            Content="❌" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Дата Заказа" Binding="{Binding OrderDate}" Width="Auto"
                                     SortMemberPath="OrderDate" />
                 <DataGridTextColumn Header="Дата Сдачи" Binding="{Binding DeliveryDate}" Width="Auto"

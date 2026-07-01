@@ -39,11 +39,12 @@ public class App : Application
         {
             context.Database.EnsureCreated(); // Создаст файл db и таблицы, если их еще нет
         }
-        
-        //Получение объекта MainViewModel, через него получение дочерних объектов вкладок и вызов их методов обновления отображения
-        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+
         var backupService = _serviceProvider.GetRequiredService<BackupService>();
         backupService.RunBackupIfNeeded();
+        //Получение объекта MainViewModel, через него получение дочерних объектов вкладок и вызов их методов обновления отображения
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+        
         mainViewModel.OrdersPage.LoadOrdersCommand.Execute(null);
         mainViewModel.WarehousePage.LoadMaterialsCommand.Execute(null);
         mainViewModel.ClientsPage.LoadClientsCommand.Execute(null);

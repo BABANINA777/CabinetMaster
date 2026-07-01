@@ -28,6 +28,7 @@
             x:Name="MyDataGrid"
             Grid.Row="1"
             ItemsSource="{Binding Materials}"
+            x:CompileBindings="False"
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
             CanUserSortColumns="True"
@@ -39,8 +40,38 @@
                 <DataGridTextColumn Header="№" Binding="{Binding $parent[DataGridRow].Index}" Width="Auto"
                                     IsReadOnly="True" CanUserSort="False" />
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" SortMemberPath="Id" IsReadOnly="True" />
-                <DataGridTextColumn Header="Название материала" Binding="{Binding MaterialName}" Width="2*"
-                                    SortMemberPath="MaterialName" />
+                <DataGridTextColumn Binding="{Binding MaterialName}" Width="2*" SortMemberPath="MaterialName">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <DockPanel LastChildFill="True" 
+                                           IsVisible="{Binding !$parent[DataGrid].DataContext.IsActiveMaterialSearch}">
+                                    <Button DockPanel.Dock="Right" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchMaterialModeCommand}"
+                                            Content="🔍" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                    <TextBlock Text="Название материала" 
+                                               FontWeight="Bold" 
+                                               VerticalAlignment="Center"/>
+                                </DockPanel>
+                                
+                                <Grid ColumnDefinitions="*, Auto" 
+                                      IsVisible="{Binding $parent[DataGrid].DataContext.IsActiveMaterialSearch}">
+                                    <TextBox Grid.Column="0" 
+                                             Text="{Binding $parent[DataGrid].DataContext.InputMaterial, Mode=TwoWay}" 
+                                             PlaceholderText="Поиск..." 
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" 
+                                            Command="{Binding $parent[DataGrid].DataContext.ActiveSearchMaterialModeCommand}"
+                                            Content="❌" 
+                                            Background="Transparent"
+                                            BorderThickness="0" />
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Кол-во на складе" Binding="{Binding QuantityInStock}" Width="1.5*"
                                     SortMemberPath="QuantityInStock" />
                 <DataGridTemplateColumn Header="Ед. изм." Width="100" SortMemberPath="Unit">
@@ -148,14 +179,14 @@
                         <StackPanel Margin="6,0">
                             <Label Content="Название материала:" Target="{Binding ElementName=MaterialNameTxt}" />
                             <TextBox x:Name="MaterialNameTxt" Text="{Binding MaterialName, Mode=TwoWay}"
-                                     Watermark="Шпон" />
+                                     PlaceholderText="Шпон" />
                         </StackPanel>
 
                         <StackPanel Margin="6,0">
                             <Label Content="Единица измерения:" />
                             <AutoCompleteBox ItemsSource="{Binding AvailableUnits}"
                                              Text="{Binding Unit, Mode=TwoWay}"
-                                             Watermark="Например: шт."
+                                             PlaceholderText="Например: шт."
                                              FilterMode="Contains"
                                              HorizontalAlignment="Stretch" />
                         </StackPanel>
@@ -163,13 +194,13 @@
                         <StackPanel Margin="6,0">
                             <Label Content="Количество:" Target="{Binding ElementName=PriceTxt}" />
                             <TextBox x:Name="PriceTxt" Text="{Binding QuantityInStockString, Mode=TwoWay}"
-                                     Watermark="0.00" />
+                                     PlaceholderText="0.00" />
                         </StackPanel>
 
                         <StackPanel Margin="6,0">
                             <Label Content="Цена за штуку:" Target="{Binding ElementName=MaterialCostTxt}" />
                             <TextBox x:Name="MaterialCostTxt" Text="{Binding PricePerUnitString, Mode=TwoWay}"
-                                     Watermark="0.00" />
+                                     PlaceholderText="0.00" />
                         </StackPanel>
                     </UniformGrid>
 

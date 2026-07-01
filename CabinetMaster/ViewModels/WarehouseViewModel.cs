@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using CabinetMaster.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,37 +12,15 @@ namespace CabinetMaster.ViewModels;
 
 public partial class WarehouseViewModel : ViewModelBase
 {
-    //логика кнопки обнавления данных
     private readonly CabinetMasterDbContext _context;
     private Material? _materialToDelete;
-    [ObservableProperty] private string editButtonText = "Редактировать";
 
-    //логика отображения окошка с добавлением заказа
-    [ObservableProperty] private bool isAddMaterialOverlayVisible;
+    #region Collections & View
 
-    [ObservableProperty] private bool isBusy;
+    private ObservableCollection<Material> all_materials { get; } = new();
 
-    //логика кнопки редактировать
-    [ObservableProperty] private bool isReadOnly = true;
-
-    [ObservableProperty] private string materialName;
-    [ObservableProperty] private string pricePerUnitString;
-    [ObservableProperty] private string quantityInStockString;
-
-
-    //логика для окошка удаления заказа
-    [ObservableProperty] private bool showConfirmWindow;
-    [ObservableProperty] private string unit;
-
-    [ObservableProperty] private bool visibalErrorMessage;
-
-    public WarehouseViewModel(CabinetMasterDbContext context)
-    {
-        _context = context;
-    }
-
-    //список заказов
-    public ObservableCollection<Material> Materials { get; } = new();
+    // Представление для таблицы с поддержкой фильтрации и сортировки
+    public DataGridCollectionView Materials { get; }
 
     public string[] AvailableUnits { get; } = new[]
     {
@@ -51,18 +32,58 @@ public partial class WarehouseViewModel : ViewModelBase
         "упаковка"
     };
 
+    #endregion
+
+    #region Search Properties
+
+    [ObservableProperty] private bool isActiveMaterialSearch; // Состояние видимости строки поиска материала
+    [ObservableProperty] private string inputMaterial = string.Empty; // Текст поиска материала
+
+    #endregion
+
+    #region UI State Properties
+
+    [ObservableProperty] private string editButtonText = "Редактировать";
+    [ObservableProperty] private bool isAddMaterialOverlayVisible;
+    [ObservableProperty] private bool isBusy;
+    [ObservableProperty] private bool isReadOnly = true;
+    [ObservableProperty] private string materialName = string.Empty;
+    [ObservableProperty] private string pricePerUnitString = string.Empty;
+    [ObservableProperty] private string quantityInStockString = string.Empty;
+    [ObservableProperty] private bool showConfirmWindow;
+    [ObservableProperty] private string unit = string.Empty;
+    [ObservableProperty] private bool visibalErrorMessage;
+
+    #endregion
+
+    #region Constructor
+
+    public WarehouseViewModel(CabinetMasterDbContext context) // Конструктор с инициализацией БД и DataGridCollectionView
+    {
+        _context = context;
+        Materials = new DataGridCollectionView(all_materials);
+        Materials.Filter = FilterMaterials;
+    }
+
+    #endregion
+
+    #region Database Operations / Commands
+
     [RelayCommand]
-    private async Task LoadMaterialsAsync()
+    private async Task LoadMaterialsAsync() // Загрузка всех материалов из базы данных
     {
         IsBusy = true;
-        Materials.Clear();
+        all_materials.Clear();
         var Materials_db = await _context.Materials.ToListAsync();
-        foreach (var mat in Materials_db) Materials.Add(mat);
+        foreach (var mat in Materials_db)
+        {
+            all_materials.Add(mat);
+        }
         IsBusy = false;
     }
 
     [RelayCommand]
-    private async Task ToggleEdit()
+    private async Task ToggleEdit() // Переключение режима редактирования таблицы
     {
         if (EditButtonText == "Редактировать")
         {
@@ -78,21 +99,21 @@ public partial class WarehouseViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void DeleteMaterial(Material material)
+    private void DeleteMaterial(Material material) // Инициация процесса удаления материала с подтверждением
     {
         _materialToDelete = material;
         ShowConfirmWindow = true;
     }
 
     [RelayCommand]
-    private async Task ConfirmDeleteAsync()
+    private async Task ConfirmDeleteAsync() // Подтверждение удаления материала из базы данных
     {
         if (_materialToDelete != null)
         {
             _context.Materials.Remove(_materialToDelete);
             await _context.SaveChangesAsync();
 
-            Materials.Remove(_materialToDelete);
+            all_materials.Remove(_materialToDelete);
             _materialToDelete = null;
         }
 
@@ -100,27 +121,32 @@ public partial class WarehouseViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void CancelDelete()
+    private void CancelDelete() // Отмена удаления материала
     {
         _materialToDelete = null;
         ShowConfirmWindow = false;
     }
 
-    public async Task AddMaterialToDbAsync(Material newMaterial)
+    public async Task AddMaterialToDbAsync(Material newMaterial) // Добавление нового материала в базу данных
     {
         _context.Materials.Add(newMaterial);
         await _context.SaveChangesAsync();
-        Materials.Add(newMaterial);
+        all_materials.Add(newMaterial);
     }
 
     [RelayCommand]
-    private void OpenAddMaterialOverlay()
+    private void OpenAddMaterialOverlay() // Открытие формы добавления нового материала
     {
+        MaterialName = string.Empty;
+        PricePerUnitString = string.Empty;
+        QuantityInStockString = string.Empty;
+        Unit = string.Empty;
+        VisibalErrorMessage = false;
         IsAddMaterialOverlayVisible = true;
     }
 
     [RelayCommand]
-    private void SaveMaterial()
+    private async Task SaveMaterialAsync() // Сохранение нового материала
     {
         var new_material = new Material();
         if (string.IsNullOrWhiteSpace(MaterialName) || string.IsNullOrWhiteSpace(Unit))
@@ -146,13 +172,57 @@ public partial class WarehouseViewModel : ViewModelBase
         new_material.QuantityInStock = result1;
         new_material.PricePerUnit = result2;
         new_material.Unit = Unit;
-        AddMaterialToDbAsync(new_material);
+        await AddMaterialToDbAsync(new_material);
         IsAddMaterialOverlayVisible = false;
     }
 
     [RelayCommand]
-    private void CancelMaterial()
+    private void CancelMaterial() // Закрытие формы добавления материала
     {
         IsAddMaterialOverlayVisible = false;
     }
+
+    #endregion
+
+    #region Search / Filtering Commands & Predicates
+
+    private bool FilterMaterials(object obj) // Проверка соответствия материала активным фильтрам
+    {
+        if (obj is not Material material) return false;
+
+        // Фильтрация по названию материала (подстрока без учета регистра)
+        if (IsActiveMaterialSearch && !string.IsNullOrWhiteSpace(InputMaterial))
+        {
+            if (!material.MaterialName.Contains(InputMaterial, StringComparison.OrdinalIgnoreCase))
+                return false;
+        }
+
+        return true;
+    }
+
+    [RelayCommand]
+    private void ActiveSearchMaterialMode() // Переключение режима поиска по названию материала
+    {
+        if (IsActiveMaterialSearch == false)
+        {
+            IsActiveMaterialSearch = true;
+        }
+        else
+        {
+            IsActiveMaterialSearch = false;
+            InputMaterial = string.Empty; // сброс текста поиска при закрытии
+            Materials.Refresh();
+        }
+    }
+
+    #endregion
+
+    #region Property Change Handlers
+
+    partial void OnInputMaterialChanged(string? value) // Автоматический вызов при изменении строки поиска материала
+    {
+        Materials.Refresh();
+    }
+
+    #endregion
 }
