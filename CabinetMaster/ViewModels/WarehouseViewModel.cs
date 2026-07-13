@@ -72,6 +72,7 @@ public partial class WarehouseViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoadMaterialsAsync() // Загрузка всех материалов из базы данных
     {
+        _context.ChangeTracker.Clear();
         IsBusy = true;
         all_materials.Clear();
         var Materials_db = await _context.Materials.ToListAsync();

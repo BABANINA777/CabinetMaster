@@ -62,6 +62,7 @@ public partial class ClientsViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoadClientsAsync() // Загрузка всех клиентов из базы данных
     {
+        _context.ChangeTracker.Clear();
         IsBusy = true;
         all_clients.Clear();
         var clients_db = await _context.Clients.ToListAsync();

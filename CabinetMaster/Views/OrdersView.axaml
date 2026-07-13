@@ -7,14 +7,129 @@
              x:Class="CabinetMaster.Views.OrdersView"
              x:DataType="vm:OrdersViewModel"
              xmlns:sys="using:System">
-    <Grid RowDefinitions="50, *">
+    <UserControl.Styles>
+        <!-- Обычное состояние кнопки в палитре MainView -->
+        <Style Selector="Button.SandButton">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFF3E5" Offset="0" /> <!-- PeachPuff/Бежево-персиковый -->
+                    <GradientStop Color="#FFE4E1" Offset="1" /> <!-- MistyRose/Розово-бежевый -->
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#555555" />
+            <Setter Property="BorderBrush" Value="#EADBDB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="15,6" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <!-- Состояние наведения (Hover) -->
+        <Style Selector="Button.SandButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFE4E1" Offset="0" /> <!-- MistyRose -->
+                    <GradientStop Color="#FFF0F5" Offset="1" /> <!-- LavenderBlush -->
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#222222" />
+            <Setter Property="BorderBrush" Value="#EADBDB" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        
+        <!-- Состояние нажатия (Pressed) -->
+        <Style Selector="Button.SandButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFD8C2" Offset="0" />
+                    <GradientStop Color="#FFC6B8" Offset="1" />
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#000000" />
+            <Setter Property="BorderBrush" Value="#D2C0C0" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- Главное действие (Primary Button) -->
+        <Style Selector="Button.PrimaryButton">
+            <Setter Property="Background" Value="#4A6572" /> <!-- Premium slate blue -->
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#344955" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="18,8" />
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.PrimaryButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#344955" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#232F34" />
+        </Style>
+        <Style Selector="Button.PrimaryButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#232F34" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        
+        <!-- Вторичные действия (Secondary Button) -->
+        <Style Selector="Button.SecondaryButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#555555" />
+            <Setter Property="BorderBrush" Value="#CCCCCC" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="15,6" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.SecondaryButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#F5F5F5" />
+            <Setter Property="Foreground" Value="#222222" />
+            <Setter Property="BorderBrush" Value="#BBBBBB" />
+        </Style>
+        <Style Selector="Button.SecondaryButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#E0E0E0" />
+            <Setter Property="Foreground" Value="#000000" />
+        </Style>
+
+        <!-- Отступы для ячеек таблицы (чтобы таблица "дышала") -->
+        <Style Selector="DataGridCell">
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="DataGridCell TextBlock">
+            <Setter Property="Foreground" Value="#333333" />
+        </Style>
+        <!-- Чередование строк таблицы (Зебра) -->
+        <Style Selector="DataGridRow:nth-child(2n)">
+            <Setter Property="Background" Value="#FAFAFA" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="50, *, Auto">
         <!--Кнопки Функционал-->
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
-                <Button Content="Добавить заказ" Command="{Binding OpenAddOrderCommand}" />
-                <Button Content="Обновить" Command="{Binding LoadOrdersCommand}" />
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="10,5,10,5">
+                <Button Command="{Binding OpenAddOrderCommand}"
+                        Classes="PrimaryButton"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Content="➕ Добавить заказ"/>
+                <Button Content="🔄 Обновить" Command="{Binding LoadOrdersCommand}" Classes="SecondaryButton" />
                 <Button Command="{Binding ToggleEditCommand}"
-                        Content="{Binding EditButtonText}" />
+                        Content="{Binding EditButtonText}"
+                        Classes="SecondaryButton" />
             </StackPanel>
 
             <ProgressBar Minimum="0"
@@ -30,12 +145,14 @@
             Grid.Row="1"
             ItemsSource="{Binding Orders}"
             AutoGenerateColumns="False"
-            GridLinesVisibility="All"
+            GridLinesVisibility="Horizontal"
             CanUserSortColumns="True"
             HeadersVisibility="All"
             IsEnabled="{Binding !IsBusy}"
             IsReadOnly="{Binding IsReadOnly}"
-            x:CompileBindings="False">
+            x:CompileBindings="False"
+            SelectedItem="{Binding SelectedOrder, Mode=TwoWay}"
+            RowBackground="White">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№"
@@ -47,8 +164,8 @@
 
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" SortMemberPath="Id"
                                     IsReadOnly="True" />
-                <DataGridTextColumn Binding="{Binding ClientName}" Width="2*"
-                                    SortMemberPath="ClientName">
+                <DataGridTextColumn Binding="{Binding Client.ClientName}" Width="2*"
+                                    SortMemberPath="ClientName" >
                     <DataGridTextColumn.HeaderTemplate>
                         <DataTemplate>
                             <Grid>
@@ -80,6 +197,7 @@
                         </DataTemplate>
                     </DataGridTextColumn.HeaderTemplate>
                 </DataGridTextColumn>
+                
                 <DataGridTextColumn Binding="{Binding ItemName}" Width="2*"
                                     SortMemberPath="ItemName">
                     <DataGridTextColumn.HeaderTemplate>
@@ -113,24 +231,92 @@
                         </DataTemplate>
                     </DataGridTextColumn.HeaderTemplate>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Дата Заказа" Binding="{Binding OrderDate}" Width="Auto"
+                <DataGridTextColumn Header="Дата Заказа" Binding="{Binding OrderDate, StringFormat='{}{0:dd.MM.yyyy}'}" Width="Auto"
                                     SortMemberPath="OrderDate" />
-                <DataGridTextColumn Header="Дата Сдачи" Binding="{Binding DeliveryDate}" Width="Auto"
+                <DataGridTextColumn Header="Дата Сдачи" Binding="{Binding DeliveryDate, StringFormat='{}{0:dd.MM.yyyy}'}" Width="Auto"
                                     SortMemberPath="DeliveryDate" />
-                <DataGridTextColumn Header="Стоимость (руб)" Binding="{Binding Price}" Width="1*"
-                                    SortMemberPath="Price" IsReadOnly="False" />
-                <DataGridTextColumn Header="Себестоимость (руб)" Binding="{Binding MaterialCost}" Width="1*"
-                                    SortMemberPath="MaterialCost" />
-                <DataGridTextColumn Header="Чистая прибыль (руб)" Binding="{Binding Profit}" IsReadOnly="True"
-                                    Width="1*" SortMemberPath="Profit" />
+                <DataGridTemplateColumn Header="Стоимость (руб)" Width="1*" SortMemberPath="Price">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Price, StringFormat='{}{0:N0}'}" 
+                                       HorizontalAlignment="Right" 
+                                       VerticalAlignment="Center" 
+                                       Margin="0,0,15,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Price, Mode=TwoWay}" 
+                                     HorizontalAlignment="Stretch" 
+                                     VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Себестоимость (руб)" Width="1*" SortMemberPath="MaterialCost">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding MaterialCost, StringFormat='{}{0:N0}'}" 
+                                       HorizontalAlignment="Right" 
+                                       VerticalAlignment="Center" 
+                                       Margin="0,0,15,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Чистая прибыль (руб)" Width="1*" SortMemberPath="Profit">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Profit, StringFormat='{}{0:N0}'}" 
+                                       HorizontalAlignment="Right" 
+                                       VerticalAlignment="Center" 
+                                       Margin="0,0,15,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="Статус" Width="1*" SortMemberPath="Status">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:CompileBindings="False">
                             <Grid>
-                                <TextBlock Text="{Binding Status}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"
-                                           IsVisible="{Binding $parent[DataGrid].IsReadOnly}" />
+                                <Border CornerRadius="4" 
+                                        Padding="8,4" 
+                                        HorizontalAlignment="Center" 
+                                        VerticalAlignment="Center"
+                                        Tag="{Binding Status}"
+                                        IsVisible="{Binding $parent[DataGrid].IsReadOnly}">
+                                    <Border.Styles>
+                                        <!-- Принят -->
+                                        <Style Selector="Border[Tag=Принят]">
+                                            <Setter Property="Background" Value="#FFFDE7" />
+                                            <Setter Property="BorderBrush" Value="#FBC02D" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                        </Style>
+                                        <Style Selector="Border[Tag=Принят] TextBlock">
+                                            <Setter Property="Foreground" Value="#F57F17" />
+                                        </Style>
+                                        
+                                        <!-- В_Производстве -->
+                                        <Style Selector="Border[Tag=В_Производстве]">
+                                            <Setter Property="Background" Value="#E3F2FD" />
+                                            <Setter Property="BorderBrush" Value="#90CAF9" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                        </Style>
+                                        <Style Selector="Border[Tag=В_Производстве] TextBlock">
+                                            <Setter Property="Foreground" Value="#1565C0" />
+                                        </Style>
+                                        
+                                        <!-- Готов -->
+                                        <Style Selector="Border[Tag=Готов]">
+                                            <Setter Property="Background" Value="#E8F5E9" />
+                                            <Setter Property="BorderBrush" Value="#81C784" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                        </Style>
+                                        <Style Selector="Border[Tag=Готов] TextBlock">
+                                            <Setter Property="Foreground" Value="#2E7D32" />
+                                        </Style>
+                                    </Border.Styles>
+                                    <TextBlock Text="{Binding Status}" 
+                                               FontWeight="SemiBold"
+                                               FontSize="12"/>
+                                </Border>
 
                                 <ComboBox ItemsSource="{Binding AllStatuses}"
                                           SelectedItem="{Binding Status}"
@@ -145,7 +331,7 @@
                 <DataGridTemplateColumn Header="Удалить" Width="Auto" IsVisible="{Binding !IsReadOnly}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="❌"
+                            <Button Content="🗑️"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     Foreground="Red"
@@ -160,8 +346,9 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+
         <!--Оверлей удаления-->
-        <Grid Grid.Row="0" Grid.RowSpan="2"
+        <Grid Grid.Row="0" Grid.RowSpan="3"
               Background="#A0000000"
               IsVisible="{Binding ShowConfirmWindow}"
               HorizontalAlignment="Stretch"
@@ -192,18 +379,21 @@
                                 Width="80"
                                 HorizontalContentAlignment="Center"
                                 Command="{Binding ConfirmDeleteCommand}"
-                                HotKey="Enter" />
+                                HotKey="Enter"
+                                Classes="SandButton"/>
                         <Button Content="Отмена"
                                 Width="80"
                                 HorizontalContentAlignment="Center"
                                 Command="{Binding CancelDeleteCommand}"
-                                HotKey="Escape" />
+                                HotKey="Escape" 
+                                Classes="SandButton"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
+
         <!--Оверлей добавления заказа-->
-        <Grid Grid.Row="0" Grid.RowSpan="2"
+        <Grid Grid.Row="0" Grid.RowSpan="3"
               Background="#A0000000"
               IsVisible="{Binding IsAddOrderOverlayVisible}"
               HorizontalAlignment="Stretch"
@@ -222,8 +412,14 @@
                     <UniformGrid Grid.Row="0" Columns="5" Rows="1" Margin="20,20,20,10"
                                  KeyboardNavigation.TabNavigation="Cycle">
                         <StackPanel Margin="6,0">
-                            <Label Content="Имя клиента:" Target="{Binding ElementName=ClientNameTxt}" />
-                            <TextBox x:Name="ClientNameTxt" Text="{Binding ClientName, Mode=TwoWay}" Watermark="Иван" />
+                            <Label Content="Клиент:" Target="{Binding ElementName=ClientNameTxt}" />
+                            <AutoCompleteBox x:Name="ClientNameTxt" 
+                                             ItemsSource="{Binding Clients}" 
+                                             SelectedItem="{Binding Client, Mode=TwoWay}"
+                                             
+                                             FilterMode="Contains"
+                                             HorizontalAlignment="Stretch"
+                                             Watermark="Введите имя клиента..."/>
                         </StackPanel>
 
                         <StackPanel Margin="6,0">
@@ -265,18 +461,186 @@
                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
                                 <Button Content="Отмена"
                                         Command="{Binding CancelCommand}"
-                                        Padding="24,8" />
+                                        Padding="24,8"
+                                        Classes="SandButton"/>
 
                                 <Button Content="Сохранить заказ"
                                         Command="{Binding SaveCommand}"
                                         Padding="24,8"
-                                        Theme="{StaticResource AccentButtonTheme}" />
+                                        Theme="{StaticResource AccentButtonTheme}" 
+                                        Classes="SandButton"/>
                             </StackPanel>
                         </Grid>
                     </Border>
                 </Grid>
             </Border>
         </Grid>
+        
+        <!-- Подвал (Footer) -->
+        <Border Grid.Row="2" 
+                Background="{DynamicResource SystemRegionBrush}" 
+                BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" 
+                BorderThickness="0,1,0,0" 
+                Padding="20,12"
+                BoxShadow="0 -4 10 0 #08000000"> <!-- Мягкая тень, падающая вверх -->
+            <Grid ColumnDefinitions="*, Auto">
+                <!-- Сводка по выделенному заказу (слева) -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="5"
+                            IsVisible="{Binding SelectedOrder, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="📋 Выбран заказ:" Foreground="#666666" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding SelectedOrder.ItemName}" Foreground="#333333" FontWeight="Bold"/>
+                    <TextBlock Text=" | Себестоимость:" Foreground="#666666" Margin="10,0,0,0"/>
+                    <TextBlock Text="{Binding SelectedOrder.MaterialCost, StringFormat='{}{0:N0} руб.'}" Foreground="#333333" FontWeight="Bold"/>
+                    <TextBlock Text=" | Чистая прибыль:" Foreground="#666666" Margin="10,0,0,0"/>
+                    <TextBlock Text="{Binding SelectedOrder.Profit, StringFormat='{}{0:N0} руб.'}" Foreground="#333333" FontWeight="Bold"/>
+                </StackPanel>
+                
+                <TextBlock Grid.Column="0" Text="Выберите заказ в таблице для работы со спецификацией материалов" 
+                           Foreground="#999999" FontStyle="Italic" VerticalAlignment="Center"
+                           IsVisible="{Binding SelectedOrder, Converter={x:Static ObjectConverters.IsNull}}"/>
+
+                <!-- Кнопка спецификации (справа) -->
+                <Button Grid.Column="1" 
+                        Content="📦 Материалы (Спецификация)"
+                        Classes="PrimaryButton"
+                        Width="240"
+                        HorizontalContentAlignment="Center"
+                        IsEnabled="{Binding SelectedOrder, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        Click="OpenOrderSpecification"/>
+            </Grid>
+        </Border>
+        
+        <Grid Grid.Row="0" Grid.RowSpan="3"
+              Background="#A0000000"
+              IsVisible="{Binding ShowMaterialWindow}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <Border Background="{DynamicResource SystemRegionBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Width="700"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="20">
+                <Grid RowDefinitions="Auto, Auto, *, Auto">
+                    
+                    <!-- Заголовок -->
+                    <TextBlock Grid.Row="0" FontSize="18" FontWeight="SemiBold" Margin="20,20,20,15">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Материалы заказа №{0} — {1}">
+                                <Binding Path="SelectedOrder.Id"/>
+                                <Binding Path="SelectedOrder.ItemName"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    
+                    <!-- Панель добавления материала -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*, 120, Auto" Margin="20,0,20,15" KeyboardNavigation.TabNavigation="Cycle">
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <Label Content="Материал на складе:" Target="{Binding ElementName=MaterialSearchTxt}" />
+                            <AutoCompleteBox x:Name="MaterialSearchTxt"
+                                             PlaceholderText="🔍 Поиск на складе..."
+                                             ItemsSource="{Binding AvailableMaterials}"
+                                             SelectedItem="{Binding SelectedMaterial, Mode=TwoWay}"
+                                             FilterMode="Contains"
+                                             HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                            <Label Content="Количество:" Target="{Binding ElementName=QuantityTxt}" />
+                            <TextBox x:Name="QuantityTxt" 
+                                     Watermark="0" 
+                                     Text="{Binding SelectedMaterialCount, Mode=TwoWay}"/>
+                        </StackPanel>
+                        
+                        <Button Grid.Column="2" 
+                                Content="+ Добавить" 
+                                Classes="SandButton" 
+                                Theme="{StaticResource AccentButtonTheme}"
+                                VerticalAlignment="Bottom"
+                                Padding="20,9"
+                                Command="{Binding AddMaterialCommand}"/>
+                    </Grid>
+
+                    <!-- Таблица спецификации -->
+                    <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" Padding="20,15">
+                        <DataGrid x:Name="MaterialDataGrid" 
+                                  Height="250"
+                                  IsReadOnly="True" 
+                                  ItemsSource="{Binding SelectedOrder.MaterialsList}"
+                                  AutoGenerateColumns="False"
+                                  GridLinesVisibility="Horizontal"
+                                  CanUserSortColumns="True"
+                                  HeadersVisibility="All"
+                                  x:CompileBindings="False"
+                                  RowBackground="White">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Материал" Binding="{Binding Material.MaterialName}" Width="2*" />
+                                <DataGridTemplateColumn Header="Количество" Width="1*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding QuantityUsed, StringFormat='{}{0:N2}'}" 
+                                                       HorizontalAlignment="Right" 
+                                                       VerticalAlignment="Center" 
+                                                       Margin="0,0,15,0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Ед. изм." Binding="{Binding Material.Unit}" Width="1*" />
+                                <DataGridTemplateColumn Header="Цена за ед. (руб)" Width="1.2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Material.PricePerUnit, StringFormat='{}{0:N0}'}" 
+                                                       HorizontalAlignment="Right" 
+                                                       VerticalAlignment="Center" 
+                                                       Margin="0,0,15,0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Стоимость (руб)" Width="1.2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding TotalCost, StringFormat='{}{0:N0}'}" 
+                                                       HorizontalAlignment="Right" 
+                                                       VerticalAlignment="Center" 
+                                                       Margin="0,0,15,0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <!-- Подвал с кнопками управления -->
+                    <Border Grid.Row="3" Background="{DynamicResource SystemRegionBrush}" Padding="20,12"
+                            BorderBrush="{DynamicResource SystemControlTransientBorderBrush}" BorderThickness="0,1,0,0">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center"
+                                        IsVisible="{Binding ShowErrorSpecificationMassage}" Spacing="8">
+                                <TextBlock Text="⚠" Foreground="#D32F2F" FontWeight="Bold" />
+                                <TextBlock Text="{Binding ErrorSpecificationMassage}" Foreground="#D32F2F"
+                                           FontWeight="SemiBold" TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                <Button Content="Отмена"
+                                        Command="{Binding CancelMaterialsCommand}"
+                                        Padding="24,8"
+                                        Classes="SandButton"/>
+
+                                <Button Content="Сохранить"
+                                        Command="{Binding SaveMaterialsCommand}"
+                                        Padding="24,8"
+                                        Theme="{StaticResource AccentButtonTheme}" 
+                                        Classes="SandButton"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+        
     </Grid>
 
 </UserControl>

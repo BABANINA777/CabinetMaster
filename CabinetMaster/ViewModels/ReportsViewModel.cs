@@ -33,6 +33,7 @@ public partial class ReportsViewModel : ViewModelBase
     [RelayCommand]
     public async Task LoadReportAsync()
     {
+        _context.ChangeTracker.Clear();
         IsBusy = true;
         var orders = await _context.Orders.ToListAsync();
 

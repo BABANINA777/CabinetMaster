@@ -9,4 +9,5 @@ public partial class Material : ObservableObject
     public int Id { get; set; }
     public string MaterialName { get; set; }
     public string Unit { get; set; }
+    public override string ToString() => MaterialName;
 }

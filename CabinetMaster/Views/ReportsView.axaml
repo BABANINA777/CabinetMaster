@@ -6,20 +6,117 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CabinetMaster.Views.ReportsView"
              x:DataType="vm:ReportsViewModel">
+    <UserControl.Styles>
+        <!-- Обычное состояние кнопки в палитре MainView -->
+        <Style Selector="Button.SandButton">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFF3E5" Offset="0" /> <!-- PeachPuff/Бежево-персиковый -->
+                    <GradientStop Color="#FFE4E1" Offset="1" /> <!-- MistyRose/Розово-бежевый -->
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#555555" />
+            <Setter Property="BorderBrush" Value="#EADBDB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="15,6" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <!-- Состояние наведения (Hover) -->
+        <Style Selector="Button.SandButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFE4E1" Offset="0" /> <!-- MistyRose -->
+                    <GradientStop Color="#FFF0F5" Offset="1" /> <!-- LavenderBlush -->
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#222222" />
+            <Setter Property="BorderBrush" Value="#EADBDB" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        
+        <!-- Состояние нажатия (Pressed) -->
+        <Style Selector="Button.SandButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFD8C2" Offset="0" />
+                    <GradientStop Color="#FFC6B8" Offset="1" />
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#000000" />
+            <Setter Property="BorderBrush" Value="#D2C0C0" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- Главное действие (Primary Button) -->
+        <Style Selector="Button.PrimaryButton">
+            <Setter Property="Background" Value="#4A6572" /> <!-- Premium slate blue -->
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#344955" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="18,8" />
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.PrimaryButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#344955" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#232F34" />
+        </Style>
+        <Style Selector="Button.PrimaryButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#232F34" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        
+        <!-- Вторичные действия (Secondary Button) -->
+        <Style Selector="Button.SecondaryButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#555555" />
+            <Setter Property="BorderBrush" Value="#CCCCCC" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="15,6" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.SecondaryButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#F5F5F5" />
+            <Setter Property="Foreground" Value="#222222" />
+            <Setter Property="BorderBrush" Value="#BBBBBB" />
+        </Style>
+        <Style Selector="Button.SecondaryButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#E0E0E0" />
+            <Setter Property="Foreground" Value="#000000" />
+        </Style>
+    </UserControl.Styles>
+
     <Grid RowDefinitions="50, *">
         <!--Кнопки Функционал-->
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
-                <Button Content="Обновить" Command="{Binding LoadReportCommand}" />
-                <Button Content="Экспорт в Exel" Command="{Binding ExportToExcelCommand}"
-                        CommandParameter="{Binding $parent[Window]}" />
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="10,5,10,5">
+                <Button Content="🔄 Обновить" Command="{Binding LoadReportCommand}" Classes="SecondaryButton" />
+                <Button Content="📊 Экспорт в Excel" Command="{Binding ExportToExcelCommand}"
+                        CommandParameter="{Binding $parent[Window]}" Classes="PrimaryButton" />
             </StackPanel>
 
             <ProgressBar Minimum="0"
-                         Maximum="100"
-                         IsIndeterminate="True"
-                         Height="3"
-                         IsVisible="{Binding IsBusy}" />
+                          Maximum="100"
+                          IsIndeterminate="True"
+                          Height="3"
+                          IsVisible="{Binding IsBusy}" />
         </StackPanel>
         <!--Карточки с данными-->
         <UniformGrid Grid.Row="1" Columns="3" Margin="10">
@@ -28,10 +125,11 @@
                     Padding="20"
                     Margin="10"
                     Background="{DynamicResource SystemRegionBrush}"
-                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BoxShadow="0 4 12 0 #0A000000">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="ЧИСТАЯ ПРИБЫЛЬ" Foreground="Gray" FontSize="12" />
-                    <TextBlock Text="{Binding NetProfit, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="24" />
+                    <TextBlock Text="ЧИСТАЯ ПРИБЫЛЬ" Foreground="Gray" FontSize="11" FontWeight="SemiBold" LetterSpacing="0.5" />
+                    <TextBlock Text="{Binding NetProfit, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="26" Foreground="#2E7D32" />
                 </StackPanel>
             </Border>
 
@@ -40,10 +138,11 @@
                     Padding="20"
                     Margin="10"
                     Background="{DynamicResource SystemRegionBrush}"
-                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BoxShadow="0 4 12 0 #0A000000">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="ОБЩАЯ ВЫРУЧКА" Foreground="Gray" FontSize="12" />
-                    <TextBlock Text="{Binding TotalRevenue, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="24" />
+                    <TextBlock Text="ОБЩАЯ ВЫРУЧКА" Foreground="Gray" FontSize="11" FontWeight="SemiBold" LetterSpacing="0.5" />
+                    <TextBlock Text="{Binding TotalRevenue, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="26" Foreground="#1565C0" />
                 </StackPanel>
             </Border>
 
@@ -52,10 +151,11 @@
                     Padding="20"
                     Margin="10"
                     Background="{DynamicResource SystemRegionBrush}"
-                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BoxShadow="0 4 12 0 #0A000000">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="ОБЩИЕ ИЗДЕРЖКИ" Foreground="Gray" FontSize="12" />
-                    <TextBlock Text="{Binding TotalCosts, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="24" />
+                    <TextBlock Text="ОБЩИЕ ИЗДЕРЖКИ" Foreground="Gray" FontSize="11" FontWeight="SemiBold" LetterSpacing="0.5" />
+                    <TextBlock Text="{Binding TotalCosts, StringFormat={}{0:C0}}" FontWeight="Bold" FontSize="26" Foreground="#C62828" />
                 </StackPanel>
             </Border>
 
@@ -64,10 +164,11 @@
                     Padding="20"
                     Margin="10"
                     Background="{DynamicResource SystemRegionBrush}"
-                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BoxShadow="0 4 12 0 #0A000000">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="ЗАВЕРШЕННЫЕ ЗАКАЗЫ" Foreground="Gray" FontSize="12" />
-                    <TextBlock Text="{Binding CompletedOrdersCount}" FontWeight="Bold" FontSize="24" />
+                    <TextBlock Text="ЗАВЕРШЕННЫЕ ЗАКАЗЫ" Foreground="Gray" FontSize="11" FontWeight="SemiBold" LetterSpacing="0.5" />
+                    <TextBlock Text="{Binding CompletedOrdersCount}" FontWeight="Bold" FontSize="26" Foreground="#333333" />
                 </StackPanel>
             </Border>
 
@@ -76,10 +177,11 @@
                     Padding="20"
                     Margin="10"
                     Background="{DynamicResource SystemRegionBrush}"
-                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}">
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BoxShadow="0 4 12 0 #0A000000">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="АКТИВНЫЕ ЗАКАЗЫ" Foreground="Gray" FontSize="12" />
-                    <TextBlock Text="{Binding ActiveOrdersCount}" FontWeight="Bold" FontSize="24" />
+                    <TextBlock Text="АКТИВНЫЕ ЗАКАЗЫ" Foreground="Gray" FontSize="11" FontWeight="SemiBold" LetterSpacing="0.5" />
+                    <TextBlock Text="{Binding ActiveOrdersCount}" FontWeight="Bold" FontSize="26" Foreground="#333333" />
                 </StackPanel>
             </Border>
         </UniformGrid>

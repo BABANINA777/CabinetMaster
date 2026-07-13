@@ -1,8 +1,12 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using CabinetMaster.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 
 namespace CabinetMaster.ViewModels;
 
@@ -10,8 +14,9 @@ public partial class AddOrderViewModel : ViewModelBase
 {
     private readonly Action<Order?> _linkOnAddOrderClosed;
     private readonly ObservableCollection<Order> _targetOrdersCollection;
+    private readonly CabinetMasterDbContext _context;
 
-    [ObservableProperty] private string clientName;
+    [ObservableProperty] private Client? client;
 
     [ObservableProperty] private DateTime? deliveryDate;
 
@@ -23,8 +28,20 @@ public partial class AddOrderViewModel : ViewModelBase
 
     [ObservableProperty] private bool visibalErrorMessage;
 
-    public AddOrderViewModel(Action<Order?> linkOnAddOrderClosed)
+    public IEnumerable<Client> Clients
     {
+        get
+        {
+            return GetClientNamesAsync().GetAwaiter().GetResult();
+        }
+    }
+    public async Task<List<Client>> GetClientNamesAsync()
+    {
+        return await _context.Clients.ToListAsync();
+    }
+    public AddOrderViewModel(CabinetMasterDbContext context, Action<Order?> linkOnAddOrderClosed)
+    {
+        _context = context;
         _linkOnAddOrderClosed = linkOnAddOrderClosed;
         DeliveryDate = DateTime.Today.AddDays(7);
     }
@@ -34,8 +51,14 @@ public partial class AddOrderViewModel : ViewModelBase
     [RelayCommand]
     private void Save()
     {
+        //проверка выбрали ли клиента
+        if (Client == null)
+        {
+            VisibalErrorMessage = true;
+            return;
+        }
         // проверка введеных данных
-        if (string.IsNullOrWhiteSpace(ClientName) || string.IsNullOrWhiteSpace(ItemName))
+        if (string.IsNullOrWhiteSpace(ItemName))
         {
             VisibalErrorMessage = true;
             return;
@@ -73,7 +96,7 @@ public partial class AddOrderViewModel : ViewModelBase
             parsedMaterialCost = mc;
         }
 
-        CreatedOrder = new Order(ClientName, ItemName, DeliveryDate.Value, parsedPrice, parsedMaterialCost);
+        CreatedOrder = new Order(Client, ItemName, DeliveryDate.Value, parsedPrice, parsedMaterialCost);
         _linkOnAddOrderClosed(CreatedOrder);
     }
 

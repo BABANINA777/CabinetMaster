@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -23,9 +24,9 @@ public partial class Order : ObservableObject
     [ObservableProperty] private OrderStatus status = OrderStatus.Принят;
 
     //конструктор заказа
-    public Order(string clientName, string itemName, DateTime deliveryDate, decimal? price, decimal? materialCost)
+    public Order(Client client, string itemName, DateTime deliveryDate, decimal? price, decimal? materialCost)
     {
-        ClientName = clientName;
+        Client = client;
         ItemName = itemName;
         OrderDate = DateTime.Now;
         DeliveryDate = deliveryDate;
@@ -38,15 +39,13 @@ public partial class Order : ObservableObject
     }
 
     public int Id { get; set; }
-    public string ClientName { get; set; } = string.Empty;
+    public Client Client { get; set; }
     public string ItemName { get; set; } = string.Empty; // Например, "Кухня угловая"
     public DateTime OrderDate { get; } = DateTime.Now;
-
     public DateTime? DeliveryDate { get; set; }
-
-    // Чистая прибыль будет считаться автоматически на лету
-    [NotMapped]
-    public decimal? Profit
+    
+    
+    [NotMapped] public decimal? Profit// Чистая прибыль будет считаться автоматически на лету
     {
         get
         {
@@ -55,6 +54,6 @@ public partial class Order : ObservableObject
         }
         set;
     }
-
     public OrderStatus[] AllStatuses => (OrderStatus[])Enum.GetValues(typeof(OrderStatus));
+    public ObservableCollection<OrderMaterialSpecification> MaterialsList { get; set; } = new();
 }

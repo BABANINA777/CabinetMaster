@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace CabinetMaster.ViewModels;
@@ -41,8 +41,11 @@ public partial class MainViewModel : ViewModelBase
         {
             CurrentPage = targetPage;
 
-            // обновление странички отчета
-            if (targetPage is ReportsViewModel) ((ReportsViewModel)targetPage).LoadReportCommand.Execute(null);
+            // обновление данных при переходе на вкладку
+            if (targetPage is ReportsViewModel reportsVM) reportsVM.LoadReportCommand.Execute(null);
+            else if (targetPage is WarehouseViewModel warehouseVM) warehouseVM.LoadMaterialsCommand.Execute(null);
+            else if (targetPage is OrdersViewModel ordersVM) ordersVM.LoadOrdersCommand.Execute(null);
+            else if (targetPage is ClientsViewModel clientsVM) clientsVM.LoadClientsCommand.Execute(null);
 
             // Говорим интерфейсу обновить внешний вид кнопок
             OnPropertyChanged(nameof(IsOrdersActive));

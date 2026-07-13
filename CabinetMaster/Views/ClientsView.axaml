@@ -6,13 +6,123 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CabinetMaster.Views.ClientsView"
              x:DataType="vm:ClientsViewModel">
+    <UserControl.Styles>
+        <!-- Обычное состояние кнопки в палитре MainView -->
+        <Style Selector="Button.SandButton">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFF3E5" Offset="0" /> <!-- PeachPuff/Бежево-персиковый -->
+                    <GradientStop Color="#FFE4E1" Offset="1" /> <!-- MistyRose/Розово-бежевый -->
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#555555" />
+            <Setter Property="BorderBrush" Value="#EADBDB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="15,6" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <!-- Состояние наведения (Hover) -->
+        <Style Selector="Button.SandButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFE4E1" Offset="0" /> <!-- MistyRose -->
+                    <GradientStop Color="#FFF0F5" Offset="1" /> <!-- LavenderBlush -->
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#222222" />
+            <Setter Property="BorderBrush" Value="#EADBDB" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        
+        <!-- Состояние нажатия (Pressed) -->
+        <Style Selector="Button.SandButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#FFD8C2" Offset="0" />
+                    <GradientStop Color="#FFC6B8" Offset="1" />
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Foreground" Value="#000000" />
+            <Setter Property="BorderBrush" Value="#D2C0C0" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- Главное действие (Primary Button) -->
+        <Style Selector="Button.PrimaryButton">
+            <Setter Property="Background" Value="#4A6572" /> <!-- Premium slate blue -->
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#344955" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="18,8" />
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.PrimaryButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#344955" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#232F34" />
+        </Style>
+        <Style Selector="Button.PrimaryButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#232F34" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        
+        <!-- Вторичные действия (Secondary Button) -->
+        <Style Selector="Button.SecondaryButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#555555" />
+            <Setter Property="BorderBrush" Value="#CCCCCC" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="15,6" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.SecondaryButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#F5F5F5" />
+            <Setter Property="Foreground" Value="#222222" />
+            <Setter Property="BorderBrush" Value="#BBBBBB" />
+        </Style>
+        <Style Selector="Button.SecondaryButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#E0E0E0" />
+            <Setter Property="Foreground" Value="#000000" />
+        </Style>
+
+        <!-- Отступы для ячеек таблицы (чтобы таблица "дышала") -->
+        <Style Selector="DataGridCell">
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="DataGridCell TextBlock">
+            <Setter Property="Foreground" Value="#333333" />
+        </Style>
+        <!-- Чередование строк таблицы (Зебра) -->
+        <Style Selector="DataGridRow:nth-child(2n)">
+            <Setter Property="Background" Value="#FAFAFA" />
+        </Style>
+    </UserControl.Styles>
+
     <Grid RowDefinitions="50, *">
         <!--Кнопки Функционал-->
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
-                <Button Content="Добавить клиента" Command="{Binding OpenAddClientOverlayCommand}" />
-                <Button Content="Обновить" Command="{Binding LoadClientsCommand}" />
-                <Button Command="{Binding ToggleEditCommand}" Content="{Binding EditButtonText}" />
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="10,5,10,5">
+                <Button Content="➕ Добавить клиента" Command="{Binding OpenAddClientOverlayCommand}" Classes="PrimaryButton" />
+                <Button Content="🔄 Обновить" Command="{Binding LoadClientsCommand}" Classes="SecondaryButton" />
+                <Button Command="{Binding ToggleEditCommand}" Content="{Binding EditButtonText}" Classes="SecondaryButton" />
             </StackPanel>
 
             <ProgressBar Minimum="0"
@@ -29,11 +139,12 @@
             ItemsSource="{Binding Clients}"
             x:CompileBindings="False"
             AutoGenerateColumns="False"
-            GridLinesVisibility="All"
+            GridLinesVisibility="Horizontal"
             CanUserSortColumns="True"
             HeadersVisibility="All"
             IsEnabled="{Binding !IsBusy}"
-            IsReadOnly="{Binding IsReadOnly}">
+            IsReadOnly="{Binding IsReadOnly}"
+            RowBackground="White">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№" Binding="{Binding $parent[DataGridRow].Index}" Width="Auto"
@@ -78,7 +189,7 @@
                 <DataGridTemplateColumn Header="Удалить" Width="Auto" IsVisible="{Binding !IsReadOnly}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="❌"
+                            <Button Content="🗑️"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     Foreground="Red"
